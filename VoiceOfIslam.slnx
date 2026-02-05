@@ -1,5 +1,23 @@
 <Solution>
-  <Project Path="VoiceOfIslam.Client/VoiceOfIslam.Client.csproj" />
-  <Project Path="VoiceOfIslam.Shared/VoiceOfIslam.Shared.csproj" Id="67d43cf1-9a07-4aca-8a59-9c996baf6727" />
-  <Project Path="VoiceOfIslam/VoiceOfIslam.csproj" />
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Default" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="VoiceOfIslam.Client/VoiceOfIslam.Client.csproj">
+    <BuildType Solution="Default|*" Project="Release" />
+    <Build Solution="Default|*" Project="false" />
+  </Project>
+  <Project Path="VoiceOfIslam.Shared/VoiceOfIslam.Shared.csproj" Id="67d43cf1-9a07-4aca-8a59-9c996baf6727">
+    <BuildType Solution="Default|*" Project="Release" />
+    <Build Solution="Default|*" Project="false" />
+  </Project>
+  <Project Path="VoiceOfIslam.Tools/VoiceOfIslam.Tools.csproj">
+    <BuildType Solution="Default|*" Project="Release" />
+    <Build Solution="Default|*" Project="false" />
+  </Project>
+  <Project Path="VoiceOfIslam/VoiceOfIslam.csproj">
+    <BuildType Solution="Default|*" Project="Release" />
+    <Build Solution="Default|*" Project="false" />
+  </Project>
 </Solution>

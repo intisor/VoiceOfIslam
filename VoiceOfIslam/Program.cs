@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using VoiceOfIslam.Components;
+using VoiceOfIslam.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
+
+// Add DbContext configuration
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Using AddDbContextFactory for Blazor performance and thread-safety
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
