@@ -1,4 +1,5 @@
 using Azure;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using System.Text;
@@ -39,7 +40,7 @@ internal static class BlobSqlGenerator
 {
 	public static async Task<string> GenerateAsync(ScriptOptions options)
 	{
-		var containerClient = new BlobContainerClient(options.ConnectionString!, options.ContainerName);
+		var containerClient = CreateBlobContainerClient(options);
 		var rows = new List<string>();
 		await foreach (BlobItem blobItem in containerClient.GetBlobsAsync(states: BlobStates.None, traits: BlobTraits.None, prefix: options.BlobPrefix))
 		{
@@ -61,6 +62,55 @@ internal static class BlobSqlGenerator
 		sqlBuilder.AppendLine(string.Join(",\n", rows));
 		sqlBuilder.Append(';');
 		return sqlBuilder.ToString();
+	}
+
+	private static BlobContainerClient CreateBlobContainerClient(ScriptOptions options)
+	{
+		// Priority 1: Microsoft Entra ID (Recommended)
+		if (!string.IsNullOrWhiteSpace(options.AccountName))
+		{
+			return CreateBlobContainerClientWithEntraId(options.AccountName, options.ContainerName);
+		}
+
+		// Priority 2: Connection String (Fallback)
+		if (!string.IsNullOrWhiteSpace(options.ConnectionString))
+		{
+			return CreateBlobContainerClientWithConnectionString(options.ConnectionString, options.ContainerName);
+		}
+
+		throw new InvalidOperationException("Either AZURE_STORAGE_ACCOUNT_NAME or AZURE_STORAGE_CONNECTION_STRING must be set.");
+	}
+
+	/// <summary>
+	/// METHOD 1: Microsoft Entra ID with DefaultAzureCredential (Recommended)
+	/// ✅ Most Secure - No secrets in code/env vars
+	/// ✅ Works locally (Azure CLI, Visual Studio) and in Azure (Managed Identity)
+	/// ✅ Least privilege - Assign Storage Blob Data Reader role
+	/// Setup: az login (local) | Assign IAM role in Azure Portal
+	/// </summary>
+	private static BlobContainerClient CreateBlobContainerClientWithEntraId(string accountName, string containerName)
+	{
+		Console.WriteLine("✅ METHOD 1: Using Microsoft Entra ID (DefaultAzureCredential)");
+		Console.WriteLine($"   Account: {accountName}");
+
+		var blobContainerUri = new Uri($"https://{accountName}.blob.core.windows.net/{containerName}");
+		var credential = new DefaultAzureCredential();
+
+		return new BlobContainerClient(blobContainerUri, credential);
+	}
+
+	/// <summary>
+	/// METHOD 2: Connection String Authentication (Fallback)
+	/// ⚠️ Less secure - Contains account key
+	/// ⚠️ Requires credential rotation
+	/// Use for: Quick testing, external contractors without Azure access
+	/// </summary>
+	private static BlobContainerClient CreateBlobContainerClientWithConnectionString(string connectionString, string containerName)
+	{
+		Console.WriteLine("⚠️ METHOD 2: Using connection string authentication (fallback)");
+		Console.WriteLine("   Consider migrating to Microsoft Entra ID for better security");
+
+		return new BlobContainerClient(connectionString, containerName);
 	}
 
 	private static (string Speaker, string Title) ParseFileName(string blobName, string defaultSpeaker)
@@ -171,6 +221,7 @@ internal static class BlobSqlGenerator
 }
 
 internal sealed record ScriptOptions(
+	string? AccountName,
 	string? ConnectionString,
 	string ContainerName,
 	string Description,
@@ -180,6 +231,7 @@ internal sealed record ScriptOptions(
 {
 	public static ScriptOptions FromEnvironment(string[] args)
 	{
+		var accountName = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_NAME");
 		var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
 		var containerName = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONTAINER") ?? "archives";
 		var description = Environment.GetEnvironmentVariable("ARCHIVE_DESCRIPTION") ?? "Lagos State";
@@ -189,7 +241,15 @@ internal sealed record ScriptOptions(
 
 		if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
 		{
-			connectionString = args[0];
+			// Support both account name and connection string
+			if (args[0].Contains("AccountName=", StringComparison.OrdinalIgnoreCase))
+			{
+				connectionString = args[0];
+			}
+			else
+			{
+				accountName = args[0];
+			}
 		}
 		if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[1]))
 		{
@@ -200,14 +260,14 @@ internal sealed record ScriptOptions(
 			prefix = args[2];
 		}
 
-		return new ScriptOptions(connectionString, containerName, description, speaker, duration, prefix);
+		return new ScriptOptions(accountName, connectionString, containerName, description, speaker, duration, prefix);
 	}
 
 	public bool TryValidate(out string message)
 	{
-		if (string.IsNullOrWhiteSpace(ConnectionString))
+		if (string.IsNullOrWhiteSpace(AccountName) && string.IsNullOrWhiteSpace(ConnectionString))
 		{
-			message = "Set AZURE_STORAGE_CONNECTION_STRING or pass it as the first argument.";
+			message = "Set AZURE_STORAGE_ACCOUNT_NAME (recommended) or AZURE_STORAGE_CONNECTION_STRING environment variable, or pass as first argument.";
 			return false;
 		}
 
