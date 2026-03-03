@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "Method 1 - Entra ID": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AZURE_STORAGE_ACCOUNT_NAME": "YOUR_ACCOUNT_NAME",
+        "AZURE_STORAGE_CONTAINER": "archives",
+        "ARCHIVE_DESCRIPTION": "Lagos State",
+        "ARCHIVE_SPEAKER": "Unknown Speaker",
+        "ARCHIVE_DURATION": "00:00:00"
+      }
+    },
+    "Method 2 - Connection String": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AZURE_STORAGE_CONNECTION_STRING": "YOUR_CONNECTION_STRING",
+        "AZURE_STORAGE_CONTAINER": "archives",
+        "ARCHIVE_DESCRIPTION": "Lagos State",
+        "ARCHIVE_SPEAKER": "Unknown Speaker",
+        "ARCHIVE_DURATION": "00:00:00"
+      }
+    }
+  }
+}
