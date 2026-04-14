@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VoiceOfIslam.Components;
 using VoiceOfIslam.Data;
+using VoiceOfIslam.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,12 +10,15 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddScoped<AudioPlayerService>();
+builder.Services.AddScoped<MenuService>();
+
 // Add DbContext configuration
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Using AddDbContextFactory for Blazor performance and thread-safety
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+	options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
@@ -38,6 +42,6 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
 	.AddInteractiveWebAssemblyRenderMode()
-	.AddAdditionalAssemblies(typeof(VoiceOfIslam.Client._Imports).Assembly);
+	.AddAdditionalAssemblies(typeof(VoiceOfIslam.Client.Pages.Home).Assembly);
 
 app.Run();

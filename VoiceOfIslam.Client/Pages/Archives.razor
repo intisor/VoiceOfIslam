@@ -1,0 +1,131 @@
+@page "/archives"
+@inject MenuService MenuService
+
+<PageTitle>Archives - Ohun Islam</PageTitle>
+
+<div class="grain-texture"></div>
+<!-- Top App Bar -->
+<header class="w-full pt-8 pb-4 flex items-center justify-between px-6 max-w-screen-xl mx-auto bg-[#fdf9f2] dark:bg-stone-950 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#416355] dark:text-[#6B8E7F] hover:opacity-80 transition-opacity bg-transparent border-none" @onclick="MenuService.ToggleMenu">menu</button>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#416355] dark:text-[#6B8E7F]">Archives</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#416355] dark:text-[#6B8E7F] hover:opacity-80 transition-opacity" data-icon="search">search</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/10">
+<img class="w-full h-full object-cover" data-alt="close up portrait of a middle eastern man with a neat beard looking contemplative, soft warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh3_pTiCoFR7RlNDa74CE8I_K-b_5-iafUhpg9XZIHI0ZzWBsxOxIbKXQ5v6CPabVF-OPq5utLuvxhnRPL28X3rYCXzkjipcN1hrQOYYINf5GOSFEutlhVUt6dwduikAlaroDkCOE6Pd_pvIaHiSf8oh4_0-rxtA4aYp4B8AvVWBqjyCAE0JKAhlzmkGBucXSObJFln21T7NK_yqFyE8tmGnoXp46ITYOOnEHXe3moChWi1P538wtX4XBUIJhHyRHah3EY6AmtxTc"/>
+</div>
+</div>
+</header>
+<main class="max-w-screen-xl mx-auto px-6 pb-40">
+<!-- Filter Section -->
+<section class="mt-6 mb-10 overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-3 whitespace-nowrap">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary text-sm font-semibold transition-colors">All</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">Speakers</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">Patience</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">Faith</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">History</button>
+</div>
+</section>
+<!-- Featured / Stats Row (Editorial Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+<div class="md:col-span-8 bg-surface-container-low rounded-3xl p-8 relative overflow-hidden group">
+<div class="relative z-10">
+<span class="label-md uppercase tracking-[0.1em] text-primary font-bold">Featured Archive</span>
+<h2 class="text-3xl font-headline font-extrabold mt-4 mb-6 leading-tight max-w-md">The Journey of Faith: Navigating Modern Challenges</h2>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-3 rounded-full flex items-center gap-2 font-bold hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            Listen Now
+                        </button>
+<span class="text-secondary text-sm font-medium">48 mins • July 2024</span>
+</div>
+</div>
+<div class="absolute -right-10 -bottom-10 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[200px]" data-icon="library_books">library_books</span>
+</div>
+</div>
+<div class="md:col-span-4 bg-primary text-on-primary rounded-3xl p-8 flex flex-col justify-between">
+<div>
+<h3 class="text-4xl font-headline font-extrabold">124</h3>
+<p class="opacity-80 text-sm font-medium uppercase tracking-widest mt-1">Total Lectures</p>
+</div>
+<div class="pt-8">
+<p class="text-sm italic opacity-90 leading-relaxed">"The heart finds rest in the remembrance of Allah."</p>
+</div>
+</div>
+</div>
+<!-- Lecture List View -->
+<div class="space-y-6">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none">
+<div class="flex gap-6 items-center">
+<div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="minimalist architecture of a mosque interior with soft morning light hitting sandstone walls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_fDSAhUNnfF1x8M4gp0ksBQpTtEe2ZUK3W6YvVXAm-NEitmG-kJGyjGP3wIaBUtdna7exxqMVXTpfmzMS2vvjS19rvrbcECU8vJgcsfv0waQiVhQxkhN2FhhKU1xwWstQkYiGwvsi_MqCS2Q4RmPZqFV6U4b6tzGPqsgJgZCNyDvEvADhVQM_HKOU9AANcKoTLexwpiIJDosElQmzacwBMzQYN9SrHjKD5Pz1SJvauRBJm__NuEBr2d97YpVPYYeQQuu-18dn7BM"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Patience in Times of Tribulation</h4>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">Dr. Omar Suliman</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">32:15</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
+<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="bookmark">bookmark</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="share">share</button>
+<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" data-icon="play_arrow">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none">
+<div class="flex gap-6 items-center">
+<div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close up of an old manuscript with beautiful Arabic calligraphy on weathered parchment paper" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLGhI0VjyK2KtutfWwkmKFQ9XFA17V1ogay_HEwSMPhfeLoR8BJoWTMnyePZm10HcKPStOA7cvGOc9KKgV7pEM8VdFuZf603MnsYIp9G8F5n5BWHMtt8hyeWKVdexXtg6ZaIOsLOwU54bAaE6ifX9yE66GU14gd8PrtQliYkGwMNFshGY1tBBwRUeStcQTTb3-W62OJKYTx7cMf2PrYJ9g1m0TBAvRmcUMZMWmWfLNffPPwPPGakrLgV9FjimlTFWDX_inHSMTUXE"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">The History of Islamic Golden Age</h4>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">Shaykh Yasir Qadhi</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">1:15:20</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
+<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="bookmark">bookmark</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="share">share</button>
+<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" data-icon="play_arrow">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none">
+<div class="flex gap-6 items-center">
+<div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="vast night sky full of stars above a desert landscape, peaceful and awe-inspiring atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl12jAhs8hNGyceFZarIVdNh5OJImHzVHh6bqM8Cl1vTynXkKrMBlM9vks1yySfWI5jHP2-ulhaaqTirIuHTMwGDHsCNQDskDy0VCHW6Q3KFOl7JaHjWb56S29CfakNDf26cMiI_gb6n5erx3bY4jgMnAKqnsDSYVpARN9CnaDi-eZN0hZEyXVEu6aDqSCp0iJ2nIDevNNLB-TrMSVb7k3juyZN940-f-32Qb4wMD5mtR_wyL_K0v7JmRij99EljJVjOjiYoTwJ8A"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Finding Peace in Prayer</h4>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">Ustadh Nouman Ali Khan</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">24:45</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
+<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="bookmark">bookmark</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="share">share</button>
+<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" data-icon="play_arrow">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</main>

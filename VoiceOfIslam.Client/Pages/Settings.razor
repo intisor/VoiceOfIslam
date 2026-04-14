@@ -1,0 +1,133 @@
+@page "/settings"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Settings - Ohun Islam</PageTitle>
+
+<!-- Global Grain Overlay -->
+<div class="fixed inset-0 grain-texture z-[100]"></div>
+<!-- Top App Bar (Shared Component) -->
+<header class="w-full pt-8 pb-4 bg-[#fdf9f2] dark:bg-stone-950 sticky top-0 z-40">
+<div class="flex items-center justify-between px-6 max-w-screen-xl mx-auto">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#416355] dark:text-[#6B8E7F] cursor-pointer" @onclick='() => NavigationManager.NavigateTo("/")'>arrow_back</span>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#416355] dark:text-[#6B8E7F]">Settings</h1>
+</div>
+<div class="text-[#416355] font-extrabold tracking-tighter text-xl">
+                Ohun Islam
+            </div>
+</div>
+</header>
+<main class="max-w-screen-md mx-auto px-6 pb-40 pt-6">
+<!-- Profile Header Section -->
+<section class="mb-10 flex items-center gap-6">
+<div class="w-20 h-20 rounded-full bg-primary-container/20 flex items-center justify-center border-2 border-primary/10 overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a thoughtful man in soft natural lighting with a blurred warm interior background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABwDrBQ03rP_avoNw0pJ8g2xW0e8lD3fa7EaRENeVWgw94NTuL9sRxR8u9EKHgbKEZihlDV_0ZzwZZfkRWN1nJ_RqaZvXzlOqfyW6LiaaKWmDzqb8ACBUWTGKGJmFySJIbhykTxDpH_MxBXMaBBpmySsNctbfLzzSzOh7XkUw6UPjU-ivNvpK08MxXz0pFF_lhjA1I7gIcd24A6lnZGnapu9OVP0NY3FuT0yovImdGDK2A3t7U9UKpJPpnUjN8p2-9Zd9HzLJfFr0"/>
+</div>
+<div>
+<h2 class="font-headline font-bold text-xl text-on-surface">Abdullah Rahim</h2>
+<p class="font-label text-sm text-secondary tracking-wide uppercase">Free Account</p>
+</div>
+</section>
+<!-- Settings Groups -->
+<div class="space-y-12">
+<!-- Experience Group -->
+<div>
+<h3 class="font-label text-[10px] uppercase tracking-[0.15em] text-secondary/60 mb-6 px-2">Experience</h3>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<!-- Add to Home Screen -->
+<div class="flex items-center justify-between p-6 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="install_mobile">install_mobile</span>
+<span class="font-medium text-on-surface">Add to Home Screen</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Theme Mode -->
+<div class="flex items-center justify-between p-6 border-t border-surface/10 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="dark_mode">dark_mode</span>
+<div class="flex flex-col">
+<span class="font-medium text-on-surface">Theme Mode</span>
+<span class="text-xs text-secondary">Light</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Notifications -->
+<div class="flex items-center justify-between p-6 border-t border-surface/10">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+<span class="font-medium text-on-surface">Notifications</span>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative p-1 flex items-center justify-end">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Group -->
+<div>
+<h3 class="font-label text-[10px] uppercase tracking-[0.15em] text-secondary/60 mb-6 px-2">Content</h3>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<div class="flex items-center justify-between p-6 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="download">download</span>
+<span class="font-medium text-on-surface">Offline Lectures</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-6 border-t border-surface/10 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="history">history</span>
+<span class="font-medium text-on-surface">Listening History</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Support Group -->
+<div>
+<h3 class="font-label text-[10px] uppercase tracking-[0.15em] text-secondary/60 mb-6 px-2">Sanctuary</h3>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<div class="flex items-center justify-between p-6 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<span class="font-medium text-on-surface">About Ohun Islam</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-6 border-t border-surface/10 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="favorite">favorite</span>
+<span class="font-medium text-on-surface">Support Our Mission</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="open_in_new">open_in_new</span>
+</div>
+</div>
+</div>
+<!-- Sign Out -->
+<button class="w-full py-4 text-error font-medium flex items-center justify-center gap-2 hover:bg-error-container/20 rounded-xl transition-colors">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Sign Out
+            </button>
+</div>
+</main><!-- Navigation Drawer (Side Nav for Desktop) -->
+<aside class="hidden md:fixed left-0 top-0 h-full w-80 bg-[#fdf9f2] dark:bg-stone-950 flex flex-col p-8 space-y-4 shadow-2xl shadow-[#1c1c18]/5 z-50 transition-transform -translate-x-full">
+<div class="mb-8">
+<span class="text-[#416355] italic font-['Manrope'] font-semibold text-2xl">Sanctuary</span>
+</div>
+<div class="space-y-2">
+<a class="flex items-center gap-4 p-4 text-[#685c53] hover:bg-[#f7f3ec] rounded-full transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-['Manrope'] font-semibold">Daily Verse</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-[#685c53] hover:bg-[#f7f3ec] rounded-full transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-['Manrope'] font-semibold">Qibla</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-[#685c53] hover:bg-[#f7f3ec] rounded-full transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-['Manrope'] font-semibold">Donations</span>
+</a>
+</div>
+</aside>

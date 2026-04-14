@@ -1,9 +1,136 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject AudioPlayerService AudioPlayer
+@inject MenuService MenuService
+@inject NavigationManager NavigationManager
 
-@Body
+<div class="page">
+    @if (MenuService.IsMenuOpen)
+    {
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[45] transition-opacity duration-300" @onclick="CloseMenu"></div>
+    }
+
+    <!-- Side Navigation Drawer -->
+    <div class="fixed inset-y-0 left-0 z-50 h-full w-80 bg-[#fdf9f2] dark:bg-stone-950 rounded-r-[2rem] shadow-2xl shadow-[#1c1c18]/5 flex flex-col p-8 space-y-4 transition-transform duration-500 ease-in-out-duration-500 @(MenuService.IsMenuOpen ? "translate-x-0" : "-translate-x-full")">
+        <div class="flex items-center gap-3 mb-8">
+            <h2 class="text-[#416355] italic font-['Manrope'] font-semibold text-2xl">Sanctuary</h2>
+            <button class="ml-auto material-symbols-outlined text-secondary" @onclick="CloseMenu">close</button>
+        </div>
+        <nav class="flex flex-col gap-2">
+            <a class="flex items-center gap-4 p-4 text-[#685c53] hover:bg-[#f7f3ec] dark:hover:bg-stone-800 rounded-full font-['Manrope'] font-semibold transition-colors" href="#" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">auto_stories</span>
+                Daily Verse
+            </a>
+            <a class="flex items-center gap-4 p-4 text-[#685c53] hover:bg-[#f7f3ec] dark:hover:bg-stone-800 rounded-full font-['Manrope'] font-semibold transition-colors" href="#" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">explore</span>
+                Qibla
+            </a>
+            <a class="flex items-center gap-4 p-4 text-[#685c53] hover:bg-[#f7f3ec] dark:hover:bg-stone-800 rounded-full font-['Manrope'] font-semibold transition-colors" href="#" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                Donations
+            </a>
+        </nav>
+    </div>
+
+    <main>
+        @Body
+    </main>
+
+    @if (ShouldShowMiniPlayer)
+    {
+        <!-- Persistent Mini-Player -->
+        <div class="fixed bottom-24 left-6 right-6 z-40 md:left-auto md:right-8 md:w-[400px]">
+            <div class="bg-surface/80 backdrop-blur-xl rounded-2xl p-4 flex items-center gap-4 shadow-[0_-8px_32px_rgba(28,28,24,0.06)] border border-outline-variant/20 cursor-pointer" @onclick="GoToNowPlaying">
+                <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                    <img alt="Album Art" class="w-full h-full object-cover" src="@(AudioPlayer.CurrentTrack?.BlobUrl ?? "https://lh3.googleusercontent.com/aida-public/AB6AXuBDGMvHvBIZ9zTQFZuVkgu0v5yt1veyhkJRAJdmOJIT9mm4sfcokI2DxhmB8AS00xszFZ9AMFkgtHK3qjvyjKlmL92WHKkHsI7gwKxyWbMuZ1wMxvxnrWgVCwRW5oTsfJtUnOGHzbuUCx0i9vy08Xtyg_6a7bualA_KwCEN__rqIdrWHb3m0sjcu923bjRV2BoTTJMl_2P66llHqb9KDhYmZbU7q12Aj21weyllGFcCQdKsTT-0VhiV-nd4YmVmu63qgcFN9t4LKA8")" />
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Current</p>
+                    <h5 class="text-on-surface font-semibold text-sm truncate">@(AudioPlayer.CurrentTrack?.Title ?? "Select a track")</h5>
+                </div>
+                <div class="flex items-center gap-2" @onclick:stopPropagation="true">
+                    <button class="p-2 hover:bg-surface-container-low rounded-full transition-colors text-on-surface">
+                        <span class="material-symbols-outlined">skip_previous</span>
+                    </button>
+                    <button class="w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20" @onclick="TogglePlay">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">@(AudioPlayer.IsPlaying ? "pause" : "play_arrow")</span>
+                    </button>
+                    <button class="p-2 hover:bg-surface-container-low rounded-full transition-colors text-on-surface">
+                        <span class="material-symbols-outlined">skip_next</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Progress Bar (Mini) -->
+            <div class="absolute bottom-0 left-4 right-4 h-1 bg-outline-variant/10 rounded-full overflow-hidden">
+                <div class="h-full bg-primary transition-all duration-300" style="width: @(AudioPlayer.Progress * 100)%"></div>
+            </div>
+        </div>
+    }
+
+    <!-- BottomNavBar -->
+    <nav class="fixed bottom-0 left-0 w-full z-50">
+        <div class="bg-[#fdf9f2]/80 dark:bg-stone-900/80 backdrop-blur-xl w-full flex justify-around items-center px-6 pb-6 pt-2 rounded-t-3xl shadow-[0_-8px_32px_rgba(28,28,24,0.06)]">
+            <!-- Home -->
+            <NavLink class="flex flex-col items-center justify-center text-[#685c53] dark:text-stone-500 py-2 hover:text-[#416355] transition-colors scale-98-active-300ms" href="" Match="NavLinkMatch.All" ActiveClass="text-[#416355] dark:text-[#6B8E7F] font-bold">
+                <span class="material-symbols-outlined mb-1">home</span>
+                <span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em]">Home</span>
+            </NavLink>
+            <!-- Archives -->
+            <NavLink class="flex flex-col items-center justify-center text-[#685c53] dark:text-stone-500 py-2 hover:text-[#416355] transition-colors scale-98-active-300ms" href="archives" ActiveClass="text-[#416355] dark:text-[#6B8E7F] font-bold">
+                <span class="material-symbols-outlined mb-1">library_books</span>
+                <span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em]">Archives</span>
+            </NavLink>
+            <!-- Settings -->
+            <NavLink class="flex flex-col items-center justify-center text-[#685c53] dark:text-stone-500 py-2 hover:text-[#416355] transition-colors scale-98-active-300ms" href="settings" ActiveClass="text-[#416355] dark:text-[#6B8E7F] font-bold">
+                <span class="material-symbols-outlined mb-1">settings</span>
+                <span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em]">Settings</span>
+            </NavLink>
+        </div>
+    </nav>
+</div>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private bool ShouldShowMiniPlayer => AudioPlayer.CurrentTrack != null && !NavigationManager.Uri.EndsWith("/nowplaying");
+
+    protected override void OnInitialized()
+    {
+        AudioPlayer.OnStateChanged += StateHasChanged;
+        MenuService.OnStateChanged += StateHasChanged;
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        MenuService.CloseMenu();
+        StateHasChanged();
+    }
+
+    private void TogglePlay()
+    {
+        AudioPlayer.TogglePlay();
+    }
+
+    private void CloseMenu()
+    {
+        MenuService.CloseMenu();
+    }
+
+    private void GoToNowPlaying()
+    {
+        NavigationManager.NavigateTo("nowplaying");
+    }
+
+    public void Dispose()
+    {
+        AudioPlayer.OnStateChanged -= StateHasChanged;
+        MenuService.OnStateChanged -= StateHasChanged;
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

@@ -1,7 +1,127 @@
-﻿@page "/"
+@page "/"
+
+@inject AudioPlayerService AudioPlayer
+@inject MenuService MenuService
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="fixed inset-0 grain-texture z-[100]"></div>
+<!-- TopAppBar -->
+<header class="w-full pt-8 pb-4 bg-[#fdf9f2] dark:bg-stone-950 flex items-center justify-between px-6 max-w-screen-xl mx-auto sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#416355] dark:text-[#6B8E7F] hover:opacity-80 transition-opacity cursor-pointer" @onclick="MenuService.ToggleMenu">menu</span>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#416355] dark:text-[#6B8E7F]">Ohun Islam</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#416355] dark:text-[#6B8E7F] hover:opacity-80 transition-opacity cursor-pointer" data-icon="search">search</span>
+</div>
+</header>
+<main class="max-w-screen-xl mx-auto px-6 pb-40">
+<!-- Hero Section: Countdown Timer -->
+<section class="mt-8">
+<div class="bg-surface-container-lowest rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 border border-outline-variant/10">
+<div class="flex-1 space-y-4">
+<span class="font-label text-xs uppercase tracking-[0.1em] text-primary font-semibold">Live Broadcast</span>
+<h2 class="font-headline text-4xl text-on-surface leading-tight">Monday Live<br/><span class="text-secondary font-medium italic">with Ustadh Adewale</span></h2>
+<p class="text-on-surface-variant max-w-md">Join our weekly spiritual gathering as we delve into the profound wisdom of the Quran and Sunnah.</p>
+</div>
+<div class="flex flex-col items-center justify-center p-8 bg-surface-container-low rounded-2xl min-w-[280px]">
+<p class="font-label text-[10px] uppercase tracking-widest text-secondary mb-4">Starts in</p>
+<div class="flex gap-4 items-baseline">
+<div class="text-center">
+<span class="font-headline text-4xl block text-primary">02</span>
+<span class="font-label text-[10px] uppercase text-secondary">Days</span>
+</div>
+<span class="font-headline text-2xl text-outline-variant">:</span>
+<div class="text-center">
+<span class="font-headline text-4xl block text-primary">04</span>
+<span class="font-label text-[10px] uppercase text-secondary">Hrs</span>
+</div>
+<span class="font-headline text-2xl text-outline-variant">:</span>
+<div class="text-center">
+<span class="font-headline text-4xl block text-primary">12</span>
+<span class="font-label text-[10px] uppercase text-secondary">Mins</span>
+</div>
+</div>
+<button class="mt-8 w-full py-3 bg-primary text-on-primary rounded-full font-label font-semibold text-sm hover:opacity-90 transition-opacity">
+                        Set Reminder
+                    </button>
+</div>
+</div>
+</section>
+<!-- Featured Content -->
+<section class="mt-16">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline text-2xl text-on-surface">Recommended for You</h3>
+<a class="font-label text-sm text-primary font-semibold hover:underline" href="#">Explore All</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="group cursor-pointer" @onclick="PlaySampleTrack">
+<div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
+<img alt="Finding Peace in Prayer" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Calm interior of a modern mosque with soft sunlight streaming through geometric windows onto a clean carpet" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtUNBsrqBmvFEx0fCqcR_Fqfb6jOrE5702SOcG-3b86KE6ioeqICRrx_XRjxuBdQKhIDUXaiUwxEg1snPdOABKEOdH3cGtmzpqXtld7awDwx453VXm71CL-nWF2xMUn7AncpcftGb5x66ubl5mVfhBu64q9pVjSEkv-XXltmHqlixkK6_jRuHcbF7xmB7kmaVki3NsMtSyXG4bYMbbvNM1CWCVBkcrOrtlXhSFGzSP21S6Wx3qkEvDir1uHXwwbXnw8Z2TF2sMfNs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
+                                45 mins
+                            </span>
+</div>
+</div>
+<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">Finding Peace in Prayer</h4>
+<p class="text-secondary text-sm font-label uppercase tracking-wider">Series: Inner Sanctuary</p>
+</div>
+<!-- Card 2 -->
+<div class="group cursor-pointer" @onclick="PlaySampleTrack">
+<div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
+<img alt="Lessons from the Sahaba" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Antique leather-bound book on a wooden lectern with warm lantern lighting and soft dust particles in the air" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0gGmqJM7hpKsFDYlSQpAh-oQyOc8aNXoHxq6DHx3rpweVCAPI8u_gAQZUS9oUQTTlFccIjwZVDUEx4X-ySXDqqQHXjBerSNC6D-nhvTQPFJ6bOLyLpdSYV7dxln0STFmYNMV_hRfsO0Bue3mn6hxCKa814wGgifrFtWBp8hi0h7Rz1x2eBT3dKMQjs_JBNAdBuBvqGDx8YIKIv0xOn9OEI_x0iijbTuS9CCcebSWys3gVkMDF0Wlz9FL8aFdZ2cMmfHXQ5ofq5ro"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
+                                62 mins
+                            </span>
+</div>
+</div>
+<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">Lessons from the Sahaba</h4>
+<p class="text-secondary text-sm font-label uppercase tracking-wider">Series: Historical Legacies</p>
+</div>
+<!-- Card 3 (Hidden on mobile for better flow) -->
+<div class="group cursor-pointer hidden lg:block">
+<div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
+<img alt="Patience in Trials" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A single green plant growing through a crack in sun-bleached earth, bright natural daylight, optimistic mood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZZsSyxyN3qLnnNcmONTA55n36o52xdM07rKjjtX-iu2u5NZ_IOxltdZdR7mQNtzYRJfCtwP-73bpbdhjQ0PV3pIZZhLMi4-aIuOvx40qstcsgPLhxmsmKhHPUj0zstwL-Es1Jv4g5Xcy3RCupl6IN-WcSl0jkNXNSozenv6jv06QSB9RQjqIftE2wvSHazqkcayRjrdkjvRSdd5idWGdxdq0wS401QIN0ddrB7PtOuRtj3aNCaODoQeEE-7SgD0DxH4r0vn1QGvM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
+                                38 mins
+                            </span>
+</div>
+</div>
+<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">Patience in Trials</h4>
+<p class="text-secondary text-sm font-label uppercase tracking-wider">Lecture: Topical Wisdom</p>
+</div>
+</div>
+</section>
+</main>
 
-Welcome to your new app.
+@code {
+    private void PlaySampleTrack()
+
+    {
+
+        var track = new AudioStream
+
+            {
+
+                Id = Guid.NewGuid(),
+
+                Title = "Finding Peace in Prayer",
+
+                Speaker = "Ustadh Nouman Ali Khan",
+
+                BlobUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuCtUNBsrqBmvFEx0fCqcR_Fqfb6jOrE5702SOcG-3b86KE6ioeqICRrx_XRjxuBdQKhIDUXaiUwxEg1snPdOABKEOdH3cGtmzpqXtld7awDwx453VXm71CL-nWF2xMUn7AncpcftGb5x66ubl5mVfhBu64q9pVjSEkv-XXltmHqlixkK6_jRuHcbF7xmB7kmaVki3NsMtSyXG4bYMbbvNM1CWCVBkcrOrtlXhSFGzSP21S6Wx3qkEvDir1uHXwwbXnw8Z2TF2sMfNs"
+
+            };
+
+        AudioPlayer.PlayTrack(track);
+
+    }
+}
