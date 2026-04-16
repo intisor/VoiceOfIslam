@@ -3,6 +3,7 @@
 @inject AudioPlayerService AudioPlayer
 @inject MenuService MenuService
 @inject NavigationManager NavigationManager
+@inject SettingsService SettingsService
 
 <div class="page">
     @if (MenuService.IsMenuOpen)
@@ -33,9 +34,11 @@
         </nav>
     </div>
 
-    <main>
+    <main class="pb-32 md:pb-8">
         @Body
     </main>
+
+    <AudioWrapper />
 
     @if (ShouldShowMiniPlayer)
     {
@@ -43,7 +46,7 @@
         <div class="fixed bottom-24 left-6 right-6 z-40 md:left-auto md:right-8 md:w-[400px]">
             <div class="bg-surface/80 backdrop-blur-xl rounded-2xl p-4 flex items-center gap-4 shadow-[0_-8px_32px_rgba(28,28,24,0.06)] border border-outline-variant/20 cursor-pointer" @onclick="GoToNowPlaying">
                 <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                    <img alt="Album Art" class="w-full h-full object-cover" src="@(AudioPlayer.CurrentTrack?.BlobUrl ?? "https://lh3.googleusercontent.com/aida-public/AB6AXuBDGMvHvBIZ9zTQFZuVkgu0v5yt1veyhkJRAJdmOJIT9mm4sfcokI2DxhmB8AS00xszFZ9AMFkgtHK3qjvyjKlmL92WHKkHsI7gwKxyWbMuZ1wMxvxnrWgVCwRW5oTsfJtUnOGHzbuUCx0i9vy08Xtyg_6a7bualA_KwCEN__rqIdrWHb3m0sjcu923bjRV2BoTTJMl_2P66llHqb9KDhYmZbU7q12Aj21weyllGFcCQdKsTT-0VhiV-nd4YmVmu63qgcFN9t4LKA8")" />
+                    <img alt="Album Art" class="w-full h-full object-cover" src="@(CoverArtHelper.CreateCoverUrl(AudioPlayer.CurrentTrack?.Title, AudioPlayer.CurrentTrack?.Speaker))" />
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Current</p>
@@ -104,6 +107,14 @@
         AudioPlayer.OnStateChanged += StateHasChanged;
         MenuService.OnStateChanged += StateHasChanged;
         NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SettingsService.InitializeAsync();
+        }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

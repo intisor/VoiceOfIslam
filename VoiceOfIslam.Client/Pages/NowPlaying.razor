@@ -2,6 +2,7 @@
 @implements IDisposable
 @inject AudioPlayerService AudioPlayer
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>Now Playing - Ohun Islam</PageTitle>
 
@@ -19,10 +20,9 @@
     </button>
 </header>
 <main class="max-w-md mx-auto px-8 pt-6 pb-32 flex flex-col items-center">
-    <!-- Large Immersive Cover Art -->
     <div class="w-full aspect-square mb-10 relative group">
         <div class="absolute inset-0 bg-primary opacity-5 blur-3xl rounded-full scale-90 translate-y-8"></div>
-        <img alt="Lecture Cover" class="w-full h-full object-cover rounded-[2rem] shadow-2xl relative z-10" src="@(AudioPlayer.CurrentTrack?.BlobUrl ?? "https://lh3.googleusercontent.com/aida-public/AB6AXuCi4GpqmsZHkGJSBvyIKmdLd1xv4VjwO28HwEvJbbNdQslXHr6f0L_VJyASoC7l5ZvjR5xsw-F0I-XiTI09S0wfzZ-5cQNAzHdfmaVOOiaGnrg-7lEoSMONAp-5t0M5cRAHsMqRyVsgtDP3nBZZ5e0qR9eCcqI3pZcLV5xsSXCmONKRE3I6UeKGNMEWED1gNzmIHH5NyqdvlAHpP-yv6b0jnBNZ_yefP8ChGmeyxivErZsZGCHzWNFdtP5iumIfesjnWmVwT6OmRxs")" />
+        <img alt="Lecture Cover" class="w-full h-full object-cover rounded-[2rem] shadow-2xl relative z-10" src="@(CoverArtHelper.CreateCoverUrl(AudioPlayer.CurrentTrack?.Title, AudioPlayer.CurrentTrack?.Speaker))" />
     </div>
     <!-- Lecture Metadata: Editorial Tension -->
     <div class="w-full mb-8 space-y-2">
@@ -43,6 +43,7 @@
         <div class="relative h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden cursor-pointer">
             <div class="absolute h-full bg-primary rounded-full transition-all duration-300" style="width: @(AudioPlayer.Progress * 100)%"></div>
             <div class="absolute h-4 w-4 bg-primary border-[3px] border-surface rounded-full top-1/2 -translate-y-1/2 shadow-sm" style="left: @(AudioPlayer.Progress * 100)%"></div>
+            <input type="range" min="0" max="100" step="0.1" value="@(AudioPlayer.Progress * 100)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @oninput="OnSeekChanged" />
         </div>
         <div class="flex justify-between text-[10px] font-label font-medium tracking-widest text-secondary opacity-70">
             <span>@(FormatTime(AudioPlayer.Progress * (AudioPlayer.CurrentTrack?.Duration.TotalSeconds ?? 0)))</span>
@@ -53,28 +54,28 @@
     <div class="w-full flex flex-col gap-8">
         <!-- Primary Controls -->
         <div class="flex items-center justify-between px-4">
-            <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none">
+            <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none" @onclick="() => AudioPlayer.AdjustProgressBySeconds(-5)">
                 <span class="material-symbols-outlined text-3xl">replay_5</span>
             </button>
             <div class="flex items-center gap-10">
-                <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none">
+                <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none" @onclick="() => AudioPlayer.AdjustProgressBySeconds(-15)">
                     <span class="material-symbols-outlined text-3xl">skip_previous</span>
                 </button>
                 <button @onclick="TogglePlay" class="w-20 h-20 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all duration-300 border-none">
                     <span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">@(AudioPlayer.IsPlaying ? "pause" : "play_arrow")</span>
                 </button>
-                <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none">
+                <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none" @onclick="() => AudioPlayer.AdjustProgressBySeconds(15)">
                     <span class="material-symbols-outlined text-3xl">skip_next</span>
                 </button>
             </div>
-            <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none">
+            <button class="text-on-surface-variant hover:opacity-70 transition-opacity bg-transparent border-none" @onclick="() => AudioPlayer.AdjustProgressBySeconds(5)">
                 <span class="material-symbols-outlined text-3xl">forward_5</span>
             </button>
         </div>
         <!-- Tertiary Controls -->
         <div class="flex items-center justify-center gap-12 text-secondary pb-4">
-            <button class="font-headline font-bold text-sm tracking-widest px-3 py-1 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors border-none">
-                1.25x
+            <button class="font-headline font-bold text-sm tracking-widest px-3 py-1 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors border-none" @onclick="CycleSpeed">
+                @($"{AudioPlayer.PlaybackSpeed:0.##}x")
             </button>
             <button class="hover:text-primary transition-colors bg-transparent border-none">
                 <span class="material-symbols-outlined">share</span>
@@ -87,6 +88,7 @@
 </main>
 
 @code {
+
     protected override void OnInitialized()
     {
         AudioPlayer.OnStateChanged += StateHasChanged;
@@ -95,6 +97,19 @@
     private void TogglePlay()
     {
         AudioPlayer.TogglePlay();
+    }
+
+    private void CycleSpeed()
+    {
+        AudioPlayer.CyclePlaybackSpeed();
+    }
+
+    private void OnSeekChanged(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), out var value))
+        {
+            AudioPlayer.SetProgress(value / 100);
+        }
     }
 
     private void GoBack()

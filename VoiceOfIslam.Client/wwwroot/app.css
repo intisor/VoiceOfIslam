@@ -1,0 +1,103 @@
+/* VoiceOfIslam PWA and Mobile-First CSS */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Manrope', Arial, sans-serif;
+  background: #fdf9f2;
+  color: #222;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Allow text selection where appropriate */
+p, h1, h2, h3, h4, span.selectable, div.selectable {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+main {
+  flex: 1 0 auto;
+  width: 100vw;
+  max-width: 100vw;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Mobile-first grid and spacing */
+.max-w-md, .max-w-screen-md, .max-w-screen-xl {
+  max-width: 100vw !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.px-6, .px-8 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Responsive font sizes */
+h1, h2, h3, h4 {
+  word-break: break-word;
+}
+
+@media (min-width: 600px) {
+  .max-w-md, .max-w-screen-md {
+    max-width: 480px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .max-w-screen-xl {
+    max-width: 900px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Touch targets */
+button, .btn, input[type=range] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Hide scrollbars on mobile */
+body, main {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+body::-webkit-scrollbar, main::-webkit-scrollbar {
+  display: none;
+}
+
+/* PWA install banner spacing */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fffbe8;
+  color: #222;
+  padding: 1rem;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

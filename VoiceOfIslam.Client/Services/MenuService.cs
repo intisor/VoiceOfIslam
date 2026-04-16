@@ -2,23 +2,39 @@ using System;
 
 namespace VoiceOfIslam.Client.Services
 {
+    public record MenuState(bool IsMenuOpen);
+
     public class MenuService
     {
-        public bool IsMenuOpen { get; private set; }
+        private MenuState _state = new(false);
+
+        public MenuState State
+        {
+            get => _state;
+            private set
+            {
+                if (_state != value)
+                {
+                    _state = value;
+                    OnStateChanged?.Invoke();
+                }
+            }
+        }
+
+        public bool IsMenuOpen => State.IsMenuOpen;
+
         public event Action? OnStateChanged;
 
         public void ToggleMenu()
         {
-            IsMenuOpen = !IsMenuOpen;
-            OnStateChanged?.Invoke();
+            State = State with { IsMenuOpen = !State.IsMenuOpen };
         }
 
         public void CloseMenu()
         {
-            if (IsMenuOpen)
+            if (State.IsMenuOpen)
             {
-                IsMenuOpen = false;
-                OnStateChanged?.Invoke();
+                State = State with { IsMenuOpen = false };
             }
         }
     }

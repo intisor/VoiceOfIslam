@@ -3,52 +3,93 @@ using VoiceOfIslam.Shared.Models;
 
 namespace VoiceOfIslam.Client.Services
 {
+    public record AudioPlayerState(
+        AudioStream? CurrentTrack,
+        bool IsPlaying,
+        double Progress,
+        double PlaybackSpeed
+    );
+
     public class AudioPlayerService
     {
-        public AudioStream? CurrentTrack { get; private set; }
-        public bool IsPlaying { get; private set; }
-        public double Progress { get; private set; } // 0.0 to 1.0
+        private AudioPlayerState _state = new(null, false, 0, 1.0);
+
+        public AudioPlayerState State
+        {
+            get => _state;
+            private set
+            {
+                if (_state != value)
+                {
+                    _state = value;
+                    OnStateChanged?.Invoke();
+                }
+            }
+        }
+
+        public AudioStream? CurrentTrack => State.CurrentTrack;
+        public bool IsPlaying => State.IsPlaying;
+        public double Progress => State.Progress; // 0.0 to 1.0
+        public double PlaybackSpeed => State.PlaybackSpeed;
 
         public event Action? OnStateChanged;
 
         public void PlayTrack(AudioStream track)
         {
-            if (CurrentTrack?.Id != track.Id)
+            if (State.CurrentTrack?.Id != track.Id)
             {
-                CurrentTrack = track;
-                IsPlaying = true;
-                Progress = 0;
+                State = State with { CurrentTrack = track, IsPlaying = true, Progress = 0 };
             }
             else
             {
-                IsPlaying = !IsPlaying;
+                State = State with { IsPlaying = !State.IsPlaying };
             }
-            NotifyStateChanged();
         }
 
         public void TogglePlay()
         {
-            if (CurrentTrack != null)
+            if (State.CurrentTrack != null)
             {
-                IsPlaying = !IsPlaying;
-                NotifyStateChanged();
+                State = State with { IsPlaying = !State.IsPlaying };
             }
         }
 
         public void SetProgress(double progress)
         {
-            Progress = progress;
-            NotifyStateChanged();
+            State = State with { Progress = Math.Clamp(progress, 0, 1) };
+        }
+
+        public void AdjustProgressBySeconds(double seconds)
+        {
+            var durationSeconds = State.CurrentTrack?.Duration.TotalSeconds ?? 0;
+            if (durationSeconds <= 0)
+            {
+                SetProgress(State.Progress + (seconds / 100));
+                return;
+            }
+
+            var currentSeconds = State.Progress * durationSeconds;
+            var updatedSeconds = Math.Clamp(currentSeconds + seconds, 0, durationSeconds);
+            State = State with { Progress = updatedSeconds / durationSeconds };
+        }
+
+        public void CyclePlaybackSpeed()
+        {
+            var newSpeed = State.PlaybackSpeed switch
+            {
+                < 1.0 => 1.0,
+                >= 2.0 => 1.0,
+                < 1.25 => 1.25,
+                < 1.5 => 1.5,
+                _ => 2.0
+            };
+
+            State = State with { PlaybackSpeed = newSpeed };
         }
 
         public void Stop()
         {
-            CurrentTrack = null;
-            IsPlaying = false;
-            Progress = 0;
-            NotifyStateChanged();
+            State = new AudioPlayerState(null, false, 0, 1.0);
         }
-
-        private void NotifyStateChanged() => OnStateChanged?.Invoke();
     }
 }

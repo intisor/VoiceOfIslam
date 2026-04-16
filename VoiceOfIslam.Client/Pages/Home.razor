@@ -1,7 +1,11 @@
 @page "/"
+@implements IDisposable
 
 @inject AudioPlayerService AudioPlayer
+@inject LectureService LectureService
+@inject NavigationManager NavigationManager
 @inject MenuService MenuService
+@inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
 
@@ -22,30 +26,42 @@
 <div class="bg-surface-container-lowest rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 border border-outline-variant/10">
 <div class="flex-1 space-y-4">
 <span class="font-label text-xs uppercase tracking-[0.1em] text-primary font-semibold">Live Broadcast</span>
-<h2 class="font-headline text-4xl text-on-surface leading-tight">Monday Live<br/><span class="text-secondary font-medium italic">with Ustadh Adewale</span></h2>
-<p class="text-on-surface-variant max-w-md">Join our weekly spiritual gathering as we delve into the profound wisdom of the Quran and Sunnah.</p>
+<h2 class="font-headline text-4xl text-on-surface leading-tight">@(LiveLecture?.Title ?? "Monday Live")<br/><span class="text-secondary font-medium italic">@(LiveLecture is not null ? $"with {LiveLecture.Speaker}" : "with the sanctuary team")</span></h2>
+<p class="text-on-surface-variant max-w-md">@(LiveLecture?.Description ?? "Join our weekly spiritual gathering as we delve into the profound wisdom of the Quran and Sunnah.")</p>
 </div>
 <div class="flex flex-col items-center justify-center p-8 bg-surface-container-low rounded-2xl min-w-[280px]">
 <p class="font-label text-[10px] uppercase tracking-widest text-secondary mb-4">Starts in</p>
-<div class="flex gap-4 items-baseline">
-<div class="text-center">
-<span class="font-headline text-4xl block text-primary">02</span>
-<span class="font-label text-[10px] uppercase text-secondary">Days</span>
+<div class="text-center px-4 py-2">
+<span class="font-headline text-4xl block text-primary">@CountdownDays</span>
+<span class="font-label text-[10px] uppercase text-secondary">@(CountdownDays == 1 ? "Day" : "Days")</span>
 </div>
 <span class="font-headline text-2xl text-outline-variant">:</span>
 <div class="text-center">
-<span class="font-headline text-4xl block text-primary">04</span>
+<span class="font-headline text-4xl block text-primary">@CountdownHours</span>
 <span class="font-label text-[10px] uppercase text-secondary">Hrs</span>
 </div>
 <span class="font-headline text-2xl text-outline-variant">:</span>
 <div class="text-center">
-<span class="font-headline text-4xl block text-primary">12</span>
+<span class="font-headline text-4xl block text-primary">@CountdownMinutes</span>
 <span class="font-label text-[10px] uppercase text-secondary">Mins</span>
 </div>
+<span class="font-headline text-2xl text-outline-variant">:</span>
+<div class="text-center">
+<span class="font-headline text-4xl block text-primary w-12">@CountdownSeconds.ToString("D2")</span>
+<span class="font-label text-[10px] uppercase text-secondary">Secs</span>
 </div>
-<button class="mt-8 w-full py-3 bg-primary text-on-primary rounded-full font-label font-semibold text-sm hover:opacity-90 transition-opacity">
-                        Set Reminder
-                    </button>
+</div>
+<div class="mt-8 w-full flex flex-col gap-3">
+    <button class="w-full py-3 bg-primary text-on-primary rounded-full font-label font-semibold text-sm hover:opacity-90 transition-opacity" @onclick="SetReminderAsync">
+        Set Reminder
+    </button>
+    @if (LiveLecture != null)
+    {
+        <button class="w-full py-3 bg-green-700 text-white rounded-full font-label font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2" @onclick="() => PlayTrackAsync(LiveLecture)">
+            <span class="material-symbols-outlined text-xl">play_arrow</span>
+            Play Now
+        </button>
+    }
 </div>
 </div>
 </section>
@@ -53,75 +69,156 @@
 <section class="mt-16">
 <div class="flex items-center justify-between mb-8">
 <h3 class="font-headline text-2xl text-on-surface">Recommended for You</h3>
-<a class="font-label text-sm text-primary font-semibold hover:underline" href="#">Explore All</a>
+<a class="font-label text-sm text-primary font-semibold hover:underline" href="archives">Explore All</a>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-<!-- Card 1 -->
-<div class="group cursor-pointer" @onclick="PlaySampleTrack">
+@if (RecentLectures.Count == 0)
+{
+<div class="col-span-full rounded-3xl border border-outline-variant/10 bg-surface-container-low p-8 text-center text-secondary">
+    Loading lectures from the backend...
+</div>
+}
+else
+{
+    @foreach (var lecture in RecentLectures)
+    {
+<div class="group cursor-pointer" @onclick="() => PlayTrackAsync(lecture)">
 <div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
-<img alt="Finding Peace in Prayer" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Calm interior of a modern mosque with soft sunlight streaming through geometric windows onto a clean carpet" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtUNBsrqBmvFEx0fCqcR_Fqfb6jOrE5702SOcG-3b86KE6ioeqICRrx_XRjxuBdQKhIDUXaiUwxEg1snPdOABKEOdH3cGtmzpqXtld7awDwx453VXm71CL-nWF2xMUn7AncpcftGb5x66ubl5mVfhBu64q9pVjSEkv-XXltmHqlixkK6_jRuHcbF7xmB7kmaVki3NsMtSyXG4bYMbbvNM1CWCVBkcrOrtlXhSFGzSP21S6Wx3qkEvDir1uHXwwbXnw8Z2TF2sMfNs"/>
+<img alt="@(lecture.Title)" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="@(CoverArtHelper.CreateCoverUrl(lecture.Title, lecture.Speaker))"/>
 <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
 <div class="absolute bottom-6 left-6">
 <span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
-                                45 mins
+                                @(FormatDuration(lecture.Duration))
                             </span>
 </div>
 </div>
-<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">Finding Peace in Prayer</h4>
-<p class="text-secondary text-sm font-label uppercase tracking-wider">Series: Inner Sanctuary</p>
+<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">@lecture.Title</h4>
+<p class="text-secondary text-sm font-label uppercase tracking-wider">@lecture.Speaker</p>
 </div>
-<!-- Card 2 -->
-<div class="group cursor-pointer" @onclick="PlaySampleTrack">
-<div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
-<img alt="Lessons from the Sahaba" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Antique leather-bound book on a wooden lectern with warm lantern lighting and soft dust particles in the air" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0gGmqJM7hpKsFDYlSQpAh-oQyOc8aNXoHxq6DHx3rpweVCAPI8u_gAQZUS9oUQTTlFccIjwZVDUEx4X-ySXDqqQHXjBerSNC6D-nhvTQPFJ6bOLyLpdSYV7dxln0STFmYNMV_hRfsO0Bue3mn6hxCKa814wGgifrFtWBp8hi0h7Rz1x2eBT3dKMQjs_JBNAdBuBvqGDx8YIKIv0xOn9OEI_x0iijbTuS9CCcebSWys3gVkMDF0Wlz9FL8aFdZ2cMmfHXQ5ofq5ro"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-<div class="absolute bottom-6 left-6">
-<span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
-                                62 mins
-                            </span>
-</div>
-</div>
-<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">Lessons from the Sahaba</h4>
-<p class="text-secondary text-sm font-label uppercase tracking-wider">Series: Historical Legacies</p>
-</div>
-<!-- Card 3 (Hidden on mobile for better flow) -->
-<div class="group cursor-pointer hidden lg:block">
-<div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
-<img alt="Patience in Trials" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A single green plant growing through a crack in sun-bleached earth, bright natural daylight, optimistic mood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZZsSyxyN3qLnnNcmONTA55n36o52xdM07rKjjtX-iu2u5NZ_IOxltdZdR7mQNtzYRJfCtwP-73bpbdhjQ0PV3pIZZhLMi4-aIuOvx40qstcsgPLhxmsmKhHPUj0zstwL-Es1Jv4g5Xcy3RCupl6IN-WcSl0jkNXNSozenv6jv06QSB9RQjqIftE2wvSHazqkcayRjrdkjvRSdd5idWGdxdq0wS401QIN0ddrB7PtOuRtj3aNCaODoQeEE-7SgD0DxH4r0vn1QGvM"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-<div class="absolute bottom-6 left-6">
-<span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
-                                38 mins
-                            </span>
-</div>
-</div>
-<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">Patience in Trials</h4>
-<p class="text-secondary text-sm font-label uppercase tracking-wider">Lecture: Topical Wisdom</p>
-</div>
+    }
+}
 </div>
 </section>
 </main>
 
 @code {
-    private void PlaySampleTrack()
+    private AudioStream? LiveLecture;
+    private List<AudioStream> RecentLectures { get; set; } = [];
+    private System.Threading.PeriodicTimer? _timer;
 
+    protected override async Task OnInitializedAsync()
     {
+        if (LiveLecture == null)
+        {
+            LiveLecture = await LectureService.GetLiveLecture();
+        }
+        RecentLectures = await LectureService.GetRecentLectures(3);
+        
+        StartCountdownTimer();
+    }
 
-        var track = new AudioStream
-
+    private async void StartCountdownTimer()
+    {
+        _timer = new System.Threading.PeriodicTimer(TimeSpan.FromSeconds(1));
+        try
+        {
+            while (await _timer.WaitForNextTickAsync())
             {
+                StateHasChanged();
+            }
+        }
+        catch (ObjectDisposedException) { /* Ignored */ }
+    }
 
-                Id = Guid.NewGuid(),
+    private int CountdownDays => GetCountdownParts().Days;
+    private int CountdownHours => GetCountdownParts().Hours;
+    private int CountdownMinutes => GetCountdownParts().Minutes;
+    private int CountdownSeconds => GetCountdownParts().Seconds;
 
-                Title = "Finding Peace in Prayer",
+    private TimeSpan GetCountdownParts()
+    {
+        if (LiveLecture?.ScheduledAt is null)
+        {
+            return TimeSpan.Zero;
+        }
 
-                Speaker = "Ustadh Nouman Ali Khan",
+        var remaining = LiveLecture.ScheduledAt.Value - DateTime.UtcNow;
+        return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
+    }
 
-                BlobUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuCtUNBsrqBmvFEx0fCqcR_Fqfb6jOrE5702SOcG-3b86KE6ioeqICRrx_XRjxuBdQKhIDUXaiUwxEg1snPdOABKEOdH3cGtmzpqXtld7awDwx453VXm71CL-nWF2xMUn7AncpcftGb5x66ubl5mVfhBu64q9pVjSEkv-XXltmHqlixkK6_jRuHcbF7xmB7kmaVki3NsMtSyXG4bYMbbvNM1CWCVBkcrOrtlXhSFGzSP21S6Wx3qkEvDir1uHXwwbXnw8Z2TF2sMfNs"
+    private string FormatDuration(TimeSpan duration)
+    {
+        return duration.TotalHours >= 1
+            ? $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
+            : $"{duration.Minutes:D2}:{duration.Seconds:D2}";
+    }
 
-            };
+    private async Task SetReminderAsync()
+    {
+        if (LiveLecture?.ScheduledAt == null) return;
+        
+        var title = LiveLecture.Title ?? "Voice of Islam Live Broadcast";
+        var description = LiveLecture.Description ?? "Join our spiritual gathering.";
+        var start = LiveLecture.ScheduledAt.Value;
+        
+        // Assume broadcast is 2 hours long
+        var end = start.AddHours(2);
 
-        AudioPlayer.PlayTrack(track);
+        // Generate ICS format
+        var calendarContent = $@"BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Voice Of Islam//Sanctuary PWA//EN
+BEGIN:VEVENT
+UID:{Guid.NewGuid():N}@voiceofislam.sanctuary
+DTSTAMP:{DateTime.UtcNow:yyyyMMddTHHmmssZ}
+DTSTART:{start.ToUniversalTime():yyyyMMddTHHmmssZ}
+DTEND:{end.ToUniversalTime():yyyyMMddTHHmmssZ}
+SUMMARY:{title}
+DESCRIPTION:{description}
+END:VEVENT
+END:VCALENDAR";
 
+        // Push directly as file download locally through the JS interop
+        await JS.InvokeVoidAsync("voiceOfIslamStorage.downloadFile", "lecture_reminder.ics", "text/calendar;charset=utf-8", calendarContent);
+    }
+
+    private async Task PlayTrackAsync(AudioStream track)
+    {
+        var playbackUrl = await LectureService.GetPlaybackUrl(track.Id);
+        if (string.IsNullOrWhiteSpace(playbackUrl))
+        {
+            // Fallback to track.BlobUrl if available
+            playbackUrl = track.BlobUrl;
+        }
+        if (string.IsNullOrWhiteSpace(playbackUrl))
+        {
+            await JS.InvokeVoidAsync("alert", "This lecture is currently unavailable for playback.");
+            return;
+        }
+
+        var playableTrack = CreatePlayableTrack(track, playbackUrl);
+        AudioPlayer.PlayTrack(playableTrack);
+        NavigationManager.NavigateTo("/nowplaying");
+    }
+
+    private static AudioStream CreatePlayableTrack(AudioStream original, string playbackUrl)
+    {
+        return new AudioStream
+        {
+            Id = original.Id,
+            Title = original.Title,
+            Description = original.Description,
+            BlobUrl = playbackUrl,
+            CreatedAt = original.CreatedAt,
+            ScheduledAt = original.ScheduledAt,
+            IsLive = original.IsLive,
+            Speaker = original.Speaker,
+            Duration = original.Duration
+        };
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

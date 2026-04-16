@@ -1,0 +1,118 @@
+@inject VoiceOfIslam.Client.Services.AudioPlayerService AudioPlayer
+@inject IJSRuntime JS
+@implements IDisposable
+
+@if (AudioPlayer.CurrentTrack is not null && !string.IsNullOrWhiteSpace(AudioPlayer.CurrentTrack.BlobUrl))
+{
+    // The `<audio>` tag must be unmounted and remounted to properly swap sources without complex JS caching,
+    // but its presence on MainLayout guarantees cross-page playback.
+    <audio @ref="_audioRef" id="globalAudioPlayer"
+           src="@AudioPlayer.CurrentTrack.BlobUrl"
+           @onended="OnAudioEnded"
+           @onloadedmetadata="OnLoadedMetadata"
+           @onplay="OnPlay"
+           @onpause="OnPause"
+           @ontimeupdate="OnTimeUpdate"
+           style="display:none"
+           preload="auto">
+    </audio>
+}
+
+@code {
+    private ElementReference _audioRef;
+    private IJSObjectReference? _module;
+    private bool _audioLoaded = false;
+    private bool _lastIsPlaying = false;
+    private string? _lastTrackUrl = null;
+    private double _lastProgressFromUser = -1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AudioPlayer.OnStateChanged += StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _module == null)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "/audioInterop.js");
+        }
+
+        if (AudioPlayer.CurrentTrack is not null && _audioLoaded && _module is not null)
+        {
+            var isTrackChanged = AudioPlayer.CurrentTrack.BlobUrl != _lastTrackUrl;
+            
+            // Handle Track Changes
+            if (isTrackChanged)
+            {
+                await _module.InvokeVoidAsync("setCurrentTime", _audioRef, 0);
+                _lastTrackUrl = AudioPlayer.CurrentTrack.BlobUrl;
+            }
+
+            // Handle User Seeking (if Service State Progress radically jumps from our last reporting)
+            // Or if user just scrubbed
+            if (Math.Abs(AudioPlayer.Progress - _lastProgressFromUser) > 0.05 && AudioPlayer.CurrentTrack.Duration.TotalSeconds > 0)
+            {
+                 // A simple guess that if the diff is more than 5%, it was a manual seek
+                 var newTime = AudioPlayer.Progress * AudioPlayer.CurrentTrack.Duration.TotalSeconds;
+                 await _module.InvokeVoidAsync("setCurrentTime", _audioRef, newTime);
+                 _lastProgressFromUser = AudioPlayer.Progress;
+            }
+
+            // Handle Play/Pause
+            if (AudioPlayer.IsPlaying != _lastIsPlaying || isTrackChanged)
+            {
+                if (AudioPlayer.IsPlaying)
+                {
+                    await _module.InvokeVoidAsync("playAudio", _audioRef, AudioPlayer.PlaybackSpeed);
+                }
+                else
+                {
+                    await _module.InvokeVoidAsync("pauseAudio", _audioRef);
+                }
+                _lastIsPlaying = AudioPlayer.IsPlaying;
+            }
+        }
+    }
+
+    private void OnLoadedMetadata()
+    {
+        _audioLoaded = true;
+        StateHasChanged();
+    }
+
+    private async Task OnTimeUpdate()
+    {
+        if (_module is null) return;
+        
+        var currentTime = await _module.InvokeAsync<double>("getCurrentTime", _audioRef);
+        var duration = await _module.InvokeAsync<double>("getDuration", _audioRef);
+        
+        if (duration > 0)
+        {
+            var progress = currentTime / duration;
+            _lastProgressFromUser = progress; // Update internal local tracking so we don't think user jumped
+            AudioPlayer.SetProgress(progress);
+        }
+    }
+
+    private void OnPlay()
+    {
+        if (!AudioPlayer.IsPlaying) AudioPlayer.TogglePlay();
+    }
+
+    private void OnPause()
+    {
+        if (AudioPlayer.IsPlaying) AudioPlayer.TogglePlay();
+    }
+
+    private void OnAudioEnded()
+    {
+        AudioPlayer.Stop();
+    }
+
+    public void Dispose()
+    {
+        AudioPlayer.OnStateChanged -= StateHasChanged;
+    }
+}

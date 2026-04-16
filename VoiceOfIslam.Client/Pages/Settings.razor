@@ -1,5 +1,9 @@
 @page "/settings"
 @inject NavigationManager NavigationManager
+@inject SettingsService SettingsService
+@inject IJSRuntime JS
+
+@implements IDisposable
 
 <PageTitle>Settings - Ohun Islam</PageTitle>
 
@@ -21,7 +25,7 @@
 <!-- Profile Header Section -->
 <section class="mb-10 flex items-center gap-6">
 <div class="w-20 h-20 rounded-full bg-primary-container/20 flex items-center justify-center border-2 border-primary/10 overflow-hidden">
-<img alt="Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a thoughtful man in soft natural lighting with a blurred warm interior background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABwDrBQ03rP_avoNw0pJ8g2xW0e8lD3fa7EaRENeVWgw94NTuL9sRxR8u9EKHgbKEZihlDV_0ZzwZZfkRWN1nJ_RqaZvXzlOqfyW6LiaaKWmDzqb8ACBUWTGKGJmFySJIbhykTxDpH_MxBXMaBBpmySsNctbfLzzSzOh7XkUw6UPjU-ivNvpK08MxXz0pFF_lhjA1I7gIcd24A6lnZGnapu9OVP0NY3FuT0yovImdGDK2A3t7U9UKpJPpnUjN8p2-9Zd9HzLJfFr0"/>
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Ohun Islam profile artwork" src="@(CoverArtHelper.CreateCoverUrl("Abdullah Rahim", "Free Account"))"/>
 </div>
 <div>
 <h2 class="font-headline font-bold text-xl text-on-surface">Abdullah Rahim</h2>
@@ -35,34 +39,34 @@
 <h3 class="font-label text-[10px] uppercase tracking-[0.15em] text-secondary/60 mb-6 px-2">Experience</h3>
 <div class="bg-surface-container-low rounded-xl overflow-hidden">
 <!-- Add to Home Screen -->
-<div class="flex items-center justify-between p-6 hover:bg-surface-container-high transition-colors cursor-pointer">
+<button class="w-full flex items-center justify-between p-6 hover:bg-surface-container-high transition-colors cursor-pointer bg-transparent border-none text-left" @onclick="ShowInstallHelpAsync">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-primary" data-icon="install_mobile">install_mobile</span>
 <span class="font-medium text-on-surface">Add to Home Screen</span>
 </div>
 <span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
-</div>
+</button>
 <!-- Theme Mode -->
-<div class="flex items-center justify-between p-6 border-t border-surface/10 hover:bg-surface-container-high transition-colors cursor-pointer">
+<button class="w-full flex items-center justify-between p-6 border-t border-surface/10 hover:bg-surface-container-high transition-colors cursor-pointer bg-transparent border-l-0 border-r-0 border-b-0 text-left" @onclick="ToggleThemeAsync">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-primary" data-icon="dark_mode">dark_mode</span>
 <div class="flex flex-col">
 <span class="font-medium text-on-surface">Theme Mode</span>
-<span class="text-xs text-secondary">Light</span>
+<span class="text-xs text-secondary">@(SettingsService.IsDarkMode ? "Dark" : "Light")</span>
 </div>
 </div>
 <span class="material-symbols-outlined text-outline-variant" data-icon="expand_more">expand_more</span>
-</div>
+</button>
 <!-- Notifications -->
-<div class="flex items-center justify-between p-6 border-t border-surface/10">
+<button class="w-full flex items-center justify-between p-6 border-t border-surface/10 hover:bg-surface-container-high transition-colors cursor-pointer bg-transparent border-l-0 border-r-0 border-b-0 text-left" @onclick="ToggleNotificationsAsync">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
 <span class="font-medium text-on-surface">Notifications</span>
 </div>
-<div class="w-12 h-6 bg-primary rounded-full relative p-1 flex items-center justify-end">
+<div class="@GetNotificationToggleClass() rounded-full relative p-1 flex items-center">
 <div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
 </div>
-</div>
+</button>
 </div>
 </div>
 <!-- Content Group -->
@@ -131,3 +135,42 @@
 </a>
 </div>
 </aside>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SettingsService.InitializeAsync();
+            SettingsService.OnStateChanged += StateHasChanged;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleThemeAsync()
+    {
+        await SettingsService.SetDarkModeAsync(!SettingsService.IsDarkMode);
+    }
+
+    private async Task ToggleNotificationsAsync()
+    {
+        await SettingsService.SetNotificationsAsync(!SettingsService.NotificationsEnabled);
+    }
+
+    private async Task ShowInstallHelpAsync()
+    {
+        await JS.InvokeVoidAsync("alert", "Use your browser's install option to add Ohun Islam to your home screen.");
+    }
+
+    private string GetNotificationToggleClass()
+    {
+        return SettingsService.NotificationsEnabled
+            ? "w-12 h-6 bg-primary justify-end"
+            : "w-12 h-6 bg-surface-container-high justify-start";
+    }
+
+    public void Dispose()
+    {
+        SettingsService.OnStateChanged -= StateHasChanged;
+    }
+}

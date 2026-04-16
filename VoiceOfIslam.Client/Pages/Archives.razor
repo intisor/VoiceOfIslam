@@ -1,5 +1,9 @@
 @page "/archives"
+@inject AudioPlayerService AudioPlayer
+@inject LectureService LectureService
+@inject NavigationManager NavigationManager
 @inject MenuService MenuService
+@inject IJSRuntime JS
 
 <PageTitle>Archives - Ohun Islam</PageTitle>
 
@@ -13,7 +17,7 @@
 <div class="flex items-center gap-4">
 <button class="material-symbols-outlined text-[#416355] dark:text-[#6B8E7F] hover:opacity-80 transition-opacity" data-icon="search">search</button>
 <div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/10">
-<img class="w-full h-full object-cover" data-alt="close up portrait of a middle eastern man with a neat beard looking contemplative, soft warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh3_pTiCoFR7RlNDa74CE8I_K-b_5-iafUhpg9XZIHI0ZzWBsxOxIbKXQ5v6CPabVF-OPq5utLuvxhnRPL28X3rYCXzkjipcN1hrQOYYINf5GOSFEutlhVUt6dwduikAlaroDkCOE6Pd_pvIaHiSf8oh4_0-rxtA4aYp4B8AvVWBqjyCAE0JKAhlzmkGBucXSObJFln21T7NK_yqFyE8tmGnoXp46ITYOOnEHXe3moChWi1P538wtX4XBUIJhHyRHah3EY6AmtxTc"/>
+<img class="w-full h-full object-cover" data-alt="Ohun Islam profile artwork" src="@(CoverArtHelper.CreateCoverUrl("Ohun Islam", "Sanctuary"))"/>
 </div>
 </div>
 </header>
@@ -21,11 +25,12 @@
 <!-- Filter Section -->
 <section class="mt-6 mb-10 overflow-x-auto no-scrollbar">
 <div class="flex items-center gap-3 whitespace-nowrap">
-<button class="px-6 py-2 rounded-full bg-primary text-on-primary text-sm font-semibold transition-colors">All</button>
-<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">Speakers</button>
-<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">Patience</button>
-<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">Faith</button>
-<button class="px-6 py-2 rounded-full bg-surface-container-low text-secondary text-sm font-medium hover:bg-surface-container-high transition-colors">History</button>
+@foreach (var filter in Filters)
+{
+<button class="@GetFilterClass(filter) text-sm font-medium transition-colors hover:bg-surface-container-high" @onclick="() => CurrentFilter = filter">
+    @filter
+</button>
+}
 </div>
 </section>
 <!-- Featured / Stats Row (Editorial Layout) -->
@@ -48,84 +53,130 @@
 </div>
 <div class="md:col-span-4 bg-primary text-on-primary rounded-3xl p-8 flex flex-col justify-between">
 <div>
-<h3 class="text-4xl font-headline font-extrabold">124</h3>
+<h3 class="text-4xl font-headline font-extrabold">@FilteredLectures.Count()</h3>
 <p class="opacity-80 text-sm font-medium uppercase tracking-widest mt-1">Total Lectures</p>
 </div>
 <div class="pt-8">
-<p class="text-sm italic opacity-90 leading-relaxed">"The heart finds rest in the remembrance of Allah."</p>
+<p class="text-sm italic opacity-90 leading-relaxed">@(FilteredLectures.FirstOrDefault()?.Description ?? "The heart finds rest in the remembrance of Allah.")</p>
 </div>
 </div>
 </div>
 <!-- Lecture List View -->
 <div class="space-y-6">
-<!-- Card 1 -->
-<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none">
+@if (FilteredLectures.Count == 0)
+{
+<div class="rounded-xl border border-outline-variant/10 bg-surface-container-lowest p-6 text-secondary">
+    No lectures match this filter.
+</div>
+}
+else
+{
+    @foreach (var lecture in FilteredLectures)
+    {
+<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none" @onclick="() => PlayLectureAsync(lecture)">
 <div class="flex gap-6 items-center">
 <div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="minimalist architecture of a mosque interior with soft morning light hitting sandstone walls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_fDSAhUNnfF1x8M4gp0ksBQpTtEe2ZUK3W6YvVXAm-NEitmG-kJGyjGP3wIaBUtdna7exxqMVXTpfmzMS2vvjS19rvrbcECU8vJgcsfv0waQiVhQxkhN2FhhKU1xwWstQkYiGwvsi_MqCS2Q4RmPZqFV6U4b6tzGPqsgJgZCNyDvEvADhVQM_HKOU9AANcKoTLexwpiIJDosElQmzacwBMzQYN9SrHjKD5Pz1SJvauRBJm__NuEBr2d97YpVPYYeQQuu-18dn7BM"/>
+<img class="w-full h-full object-cover" alt="@lecture.Title" src="@CoverArtHelper.CreateCoverUrl(lecture.Title, lecture.Speaker)"/>
 </div>
 <div>
-<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Patience in Times of Tribulation</h4>
+<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">@lecture.Title</h4>
 <div class="flex items-center gap-3 mt-1">
-<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">Dr. Omar Suliman</span>
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">@lecture.Speaker</span>
 <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">32:15</span>
+<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">@FormatDuration(lecture.Duration)</span>
 </div>
 </div>
 </div>
 <div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
-<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="bookmark">bookmark</button>
-<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="share">share</button>
-<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" data-icon="play_arrow">
+<button class="material-symbols-outlined text-secondary hover:text-primary" @onclick="() => ToggleBookmark(lecture.Id)" @onclick:stopPropagation="true">@(IsBookmarked(lecture.Id) ? "bookmark" : "bookmark_border")</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary" @onclick="() => CopyLectureLinkAsync(lecture)" @onclick:stopPropagation="true">share</button>
+<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" @onclick="() => PlayLectureAsync(lecture)" @onclick:stopPropagation="true">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
 </button>
 </div>
 </div>
-<!-- Card 2 -->
-<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none">
-<div class="flex gap-6 items-center">
-<div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="close up of an old manuscript with beautiful Arabic calligraphy on weathered parchment paper" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLGhI0VjyK2KtutfWwkmKFQ9XFA17V1ogay_HEwSMPhfeLoR8BJoWTMnyePZm10HcKPStOA7cvGOc9KKgV7pEM8VdFuZf603MnsYIp9G8F5n5BWHMtt8hyeWKVdexXtg6ZaIOsLOwU54bAaE6ifX9yE66GU14gd8PrtQliYkGwMNFshGY1tBBwRUeStcQTTb3-W62OJKYTx7cMf2PrYJ9g1m0TBAvRmcUMZMWmWfLNffPPwPPGakrLgV9FjimlTFWDX_inHSMTUXE"/>
-</div>
-<div>
-<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">The History of Islamic Golden Age</h4>
-<div class="flex items-center gap-3 mt-1">
-<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">Shaykh Yasir Qadhi</span>
-<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">1:15:20</span>
-</div>
-</div>
-</div>
-<div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
-<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="bookmark">bookmark</button>
-<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="share">share</button>
-<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" data-icon="play_arrow">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
-</button>
-</div>
-</div>
-<!-- Card 3 -->
-<div class="bg-surface-container-lowest rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-surface-container-low transition-colors duration-300 group cursor-pointer border-none">
-<div class="flex gap-6 items-center">
-<div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-primary overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="vast night sky full of stars above a desert landscape, peaceful and awe-inspiring atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl12jAhs8hNGyceFZarIVdNh5OJImHzVHh6bqM8Cl1vTynXkKrMBlM9vks1yySfWI5jHP2-ulhaaqTirIuHTMwGDHsCNQDskDy0VCHW6Q3KFOl7JaHjWb56S29CfakNDf26cMiI_gb6n5erx3bY4jgMnAKqnsDSYVpARN9CnaDi-eZN0hZEyXVEu6aDqSCp0iJ2nIDevNNLB-TrMSVb7k3juyZN940-f-32Qb4wMD5mtR_wyL_K0v7JmRij99EljJVjOjiYoTwJ8A"/>
-</div>
-<div>
-<h4 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors">Finding Peace in Prayer</h4>
-<div class="flex items-center gap-3 mt-1">
-<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">Ustadh Nouman Ali Khan</span>
-<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-<span class="text-secondary font-light text-xs uppercase tracking-[0.05em]">24:45</span>
-</div>
-</div>
-</div>
-<div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
-<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="bookmark">bookmark</button>
-<button class="material-symbols-outlined text-secondary hover:text-primary" data-icon="share">share</button>
-<button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" data-icon="play_arrow">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
-</button>
-</div>
-</div>
+    }
+}
 </div>
 </main>
+
+@code {
+    private List<AudioStream> Lectures { get; set; } = [];
+    private readonly HashSet<Guid> BookmarkedLectures = [];
+    private string CurrentFilter { get; set; } = "All";
+
+    private static readonly string[] Filters = ["All", "Live", "Faith", "History", "Speakers"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Lectures = await LectureService.GetAllLectures();
+    }
+
+    private List<AudioStream> FilteredLectures => CurrentFilter switch
+    {
+        "Live" => Lectures.Where(lecture => lecture.IsLive).ToList(),
+        "Faith" => Lectures.Where(lecture => lecture.Title.Contains("faith", StringComparison.OrdinalIgnoreCase) || lecture.Description.Contains("faith", StringComparison.OrdinalIgnoreCase)).ToList(),
+        "History" => Lectures.Where(lecture => lecture.Title.Contains("history", StringComparison.OrdinalIgnoreCase) || lecture.Description.Contains("history", StringComparison.OrdinalIgnoreCase)).ToList(),
+        "Speakers" => Lectures.Where(lecture => !string.IsNullOrWhiteSpace(lecture.Speaker)).ToList(),
+        _ => Lectures
+    };
+
+    private async Task PlayLectureAsync(AudioStream lecture)
+    {
+        var playbackUrl = await LectureService.GetPlaybackUrl(lecture.Id);
+        if (string.IsNullOrWhiteSpace(playbackUrl))
+        {
+            await JS.InvokeVoidAsync("alert", "This lecture is currently unavailable for playback.");
+            return;
+        }
+
+        var playableTrack = CreatePlayableTrack(lecture, playbackUrl);
+        AudioPlayer.PlayTrack(playableTrack);
+        NavigationManager.NavigateTo("/nowplaying");
+    }
+
+    private static AudioStream CreatePlayableTrack(AudioStream original, string playbackUrl)
+    {
+        return new AudioStream
+        {
+            Id = original.Id,
+            Title = original.Title,
+            Description = original.Description,
+            BlobUrl = playbackUrl,
+            CreatedAt = original.CreatedAt,
+            ScheduledAt = original.ScheduledAt,
+            IsLive = original.IsLive,
+            Speaker = original.Speaker,
+            Duration = original.Duration
+        };
+    }
+
+    private void ToggleBookmark(Guid lectureId)
+    {
+        if (!BookmarkedLectures.Add(lectureId))
+        {
+            BookmarkedLectures.Remove(lectureId);
+        }
+    }
+
+    private bool IsBookmarked(Guid lectureId) => BookmarkedLectures.Contains(lectureId);
+
+    private string GetFilterClass(string filter)
+    {
+        return CurrentFilter == filter
+            ? "px-6 py-2 rounded-full bg-primary text-on-primary"
+            : "px-6 py-2 rounded-full bg-surface-container-low text-secondary";
+    }
+
+    private Task CopyLectureLinkAsync(AudioStream lecture)
+    {
+        return JS.InvokeVoidAsync("voiceOfIslamStorage.copyText", lecture.BlobUrl).AsTask();
+    }
+
+    private string FormatDuration(TimeSpan duration)
+    {
+        return duration.TotalHours >= 1
+            ? $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
+            : $"{duration.Minutes:D2}:{duration.Seconds:D2}";
+    }
+}
