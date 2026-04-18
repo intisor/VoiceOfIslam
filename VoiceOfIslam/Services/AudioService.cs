@@ -55,21 +55,27 @@ namespace VoiceOfIslam.Services
                 _logger.LogError(exception, "Failed to load live lecture from SQL Server.");
             }
 
-            // 2. If no DB live stream, inject Bond FM recurring live stream for Mondays 8:30pm WAT
-            // TEST MODE: Always show Bond FM as live now
+            // 2. Only show Bond FM as live on Mondays at 8:30pm WAT (UTC+1)
             var nowUtc = DateTime.UtcNow;
-            return new AudioStream
+            var watZone = TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time");
+            var nowWat = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, watZone);
+            // Monday = 1, 8:30pm = 20:30
+            if (nowWat.DayOfWeek == DayOfWeek.Monday && nowWat.Hour == 20 && nowWat.Minute >= 30 && nowWat.Minute < 60)
             {
-                Id = Guid.Parse("11111111-2222-3333-4444-555555555555"),
-                Title = "Bond FM Live",
-                Description = "Bond FM Monday Live Stream (TEST MODE)",
-                BlobUrl = "https://go.webgateready.com/bondfm/radio.mp3",
-                CreatedAt = nowUtc,
-                ScheduledAt = nowUtc,
-                IsLive = true,
-                Speaker = "Bond FM",
-                Duration = TimeSpan.Zero
-            };
+                return new AudioStream
+                {
+                    Id = Guid.Parse("11111111-2222-3333-4444-555555555555"),
+                    Title = "Bond FM Live",
+                    Description = "Bond FM Monday Live Stream",
+                    BlobUrl = "https://go.webgateready.com/bondfm/radio.mp3",
+                    CreatedAt = nowUtc,
+                    ScheduledAt = nowUtc,
+                    IsLive = true,
+                    Speaker = "Bond FM",
+                    Duration = TimeSpan.Zero
+                };
+            }
+            return null;
         }
 
         public async Task<List<AudioStream>> GetRecentLectures(int count)
