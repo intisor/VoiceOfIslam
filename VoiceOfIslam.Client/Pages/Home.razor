@@ -22,34 +22,42 @@
 </header>
 <main class="max-w-screen-xl mx-auto px-6 pb-40">
 <!-- Hero Section: Countdown Timer -->
-<section class="mt-8">
-<div class="bg-surface-container-lowest rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 border border-outline-variant/10">
+<section class="mt-8 hero-section">
+<div class="bg-surface-container-lowest rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 border border-outline-variant/10 hero-section">
 <div class="flex-1 space-y-4">
 <span class="font-label text-xs uppercase tracking-[0.1em] text-primary font-semibold">Live Broadcast</span>
 <h2 class="font-headline text-4xl text-on-surface leading-tight">@(LiveLecture?.Title ?? "Monday Live")<br/><span class="text-secondary font-medium italic">@(LiveLecture is not null ? $"with {LiveLecture.Speaker}" : "with the sanctuary team")</span></h2>
 <p class="text-on-surface-variant max-w-md">@(LiveLecture?.Description ?? "Join our weekly spiritual gathering as we delve into the profound wisdom of the Quran and Sunnah.")</p>
 </div>
-<div class="flex flex-col items-center justify-center p-8 bg-surface-container-low rounded-2xl min-w-[280px]">
-<p class="font-label text-[10px] uppercase tracking-widest text-secondary mb-4">Starts in</p>
-<div class="text-center px-4 py-2">
-<span class="font-headline text-4xl block text-primary">@CountdownDays</span>
-<span class="font-label text-[10px] uppercase text-secondary">@(CountdownDays == 1 ? "Day" : "Days")</span>
-</div>
-<span class="font-headline text-2xl text-outline-variant">:</span>
-<div class="text-center">
-<span class="font-headline text-4xl block text-primary">@CountdownHours</span>
-<span class="font-label text-[10px] uppercase text-secondary">Hrs</span>
-</div>
-<span class="font-headline text-2xl text-outline-variant">:</span>
-<div class="text-center">
-<span class="font-headline text-4xl block text-primary">@CountdownMinutes</span>
-<span class="font-label text-[10px] uppercase text-secondary">Mins</span>
-</div>
-<span class="font-headline text-2xl text-outline-variant">:</span>
-<div class="text-center">
-<span class="font-headline text-4xl block text-primary w-12">@CountdownSeconds.ToString("D2")</span>
-<span class="font-label text-[10px] uppercase text-secondary">Secs</span>
-</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-xl min-w-[160px] w-full max-w-[220px] mx-auto mt-4">
+    @if (CountdownDays + CountdownHours + CountdownMinutes + CountdownSeconds == 0)
+    {
+        <span class="live-badge-mobile mt-2 mb-2">Live Now</span>
+    }
+    else
+    {
+        <div class="countdown-row-mobile flex items-center gap-2">
+            <div class="countdown-part-mobile">
+                <span class="countdown-num-mobile">@CountdownDays</span>
+                <span class="countdown-label-mobile">D</span>
+            </div>
+            <span class="countdown-sep-mobile">:</span>
+            <div class="countdown-part-mobile">
+                <span class="countdown-num-mobile">@CountdownHours</span>
+                <span class="countdown-label-mobile">H</span>
+            </div>
+            <span class="countdown-sep-mobile">:</span>
+            <div class="countdown-part-mobile">
+                <span class="countdown-num-mobile">@CountdownMinutes</span>
+                <span class="countdown-label-mobile">M</span>
+            </div>
+            <span class="countdown-sep-mobile">:</span>
+            <div class="countdown-part-mobile">
+                <span class="countdown-num-mobile">@CountdownSeconds.ToString("D2")</span>
+                <span class="countdown-label-mobile">S</span>
+            </div>
+        </div>
+    }
 </div>
 <div class="mt-8 w-full flex flex-col gap-3">
     <button class="w-full py-3 bg-primary text-on-primary rounded-full font-label font-semibold text-sm hover:opacity-90 transition-opacity" @onclick="SetReminderAsync">
@@ -66,38 +74,34 @@
 </div>
 </section>
 <!-- Featured Content -->
-<section class="mt-16">
-<div class="flex items-center justify-between mb-8">
-<h3 class="font-headline text-2xl text-on-surface">Recommended for You</h3>
-<a class="font-label text-sm text-primary font-semibold hover:underline" href="archives">Explore All</a>
+<section class="mt-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline text-lg text-on-surface">Recommended for You</h3>
+<a class="font-label text-xs text-primary font-semibold hover:underline" href="archives">See All</a>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 @if (RecentLectures.Count == 0)
 {
-<div class="col-span-full rounded-3xl border border-outline-variant/10 bg-surface-container-low p-8 text-center text-secondary">
+<div class="rounded-2xl border border-outline-variant/10 bg-surface-container-low p-4 text-center text-secondary">
     Loading lectures from the backend...
 </div>
 }
 else
 {
-    @foreach (var lecture in RecentLectures)
+<div class="flex flex-row gap-3 overflow-x-auto pb-2 hide-scrollbar">
+    @foreach (var lecture in RecentLectures.Take(6))
     {
-<div class="group cursor-pointer" @onclick="() => PlayTrackAsync(lecture)">
-<div class="relative aspect-[4/5] rounded-3xl overflow-hidden mb-4 bg-surface-container-high">
-<img alt="@(lecture.Title)" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="@(CoverArtHelper.CreateCoverUrl(lecture.Title, lecture.Speaker))"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-<div class="absolute bottom-6 left-6">
-<span class="px-3 py-1 bg-surface-container-lowest/20 backdrop-blur-md text-white text-[10px] rounded-full uppercase tracking-widest font-semibold border border-white/20">
-                                @(FormatDuration(lecture.Duration))
-                            </span>
-</div>
-</div>
-<h4 class="font-headline text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">@lecture.Title</h4>
-<p class="text-secondary text-sm font-label uppercase tracking-wider">@lecture.Speaker</p>
-</div>
+        <div class="lecture-card-mobile shrink-0 w-[160px] h-[180px] bg-surface-container-high rounded-xl flex flex-col justify-between p-2 cursor-pointer" @onclick="() => PlayTrackAsync(lecture)">
+            <div class="flex-1 flex flex-col justify-end">
+                <div class="font-headline text-base text-on-surface font-bold truncate">@lecture.Title</div>
+                <div class="text-xs text-secondary truncate">@lecture.Speaker</div>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+                <span class="text-[10px] bg-surface-container-lowest/40 px-2 py-1 rounded-full">@FormatDuration(lecture.Duration)</span>
+            </div>
+        </div>
     }
-}
 </div>
+}
 </section>
 </main>
 
