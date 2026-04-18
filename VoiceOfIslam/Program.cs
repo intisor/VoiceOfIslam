@@ -32,7 +32,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // Using AddDbContextFactory for Blazor performance and thread-safety
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-	options.UseSqlServer(connectionString));
+	options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
