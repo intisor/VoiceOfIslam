@@ -10,8 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-	.AddInteractiveServerComponents()
-	.AddInteractiveWebAssemblyComponents();
+	.AddInteractiveServerComponents();
 
 builder.Services.AddScoped<AudioPlayerService>();
 builder.Services.AddScoped<MenuService>();
@@ -53,8 +52,7 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-	.AddInteractiveServerRenderMode()
-	.AddInteractiveWebAssemblyRenderMode();
+	.AddInteractiveServerRenderMode();
 	// .AddAdditionalAssemblies(typeof(VoiceOfIslam.Client.Pages.Home).Assembly);
 
 app.MapGet("/api/audio-streams", async (AudioService audioService) => await audioService.GetPastAudios());
