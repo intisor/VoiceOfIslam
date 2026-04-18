@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using VoiceOfIslam.Components;
 using VoiceOfIslam.Data;
 using VoiceOfIslam.Services;
-using VoiceOfIslam.Services;
 using VoiceOfIslam.Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,8 +54,8 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
-	.AddInteractiveWebAssemblyRenderMode()
-	.AddAdditionalAssemblies(typeof(VoiceOfIslam.Client.Pages.Home).Assembly);
+	.AddInteractiveWebAssemblyRenderMode();
+	// .AddAdditionalAssemblies(typeof(VoiceOfIslam.Client.Pages.Home).Assembly);
 
 app.MapGet("/api/audio-streams", async (AudioService audioService) => await audioService.GetPastAudios());
 app.MapGet("/api/audio-streams/live", async (AudioService audioService) => await audioService.GetLiveLecture());
