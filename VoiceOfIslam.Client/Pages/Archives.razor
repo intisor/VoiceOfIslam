@@ -88,7 +88,7 @@ else
 </div>
 </div>
 <div class="flex items-center gap-4 mt-4 md:mt-0 opacity-40 group-hover:opacity-100 transition-opacity">
-<button class="material-symbols-outlined text-secondary hover:text-primary" @onclick="() => ToggleBookmark(lecture.Id)" @onclick:stopPropagation="true">@(IsBookmarked(lecture.Id) ? "bookmark" : "bookmark_border")</button>
+
 <button class="material-symbols-outlined text-secondary hover:text-primary" @onclick="() => CopyLectureLinkAsync(lecture)" @onclick:stopPropagation="true">share</button>
 <button class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center" @onclick="() => PlayLectureAsync(lecture)" @onclick:stopPropagation="true">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
@@ -102,7 +102,7 @@ else
 
 @code {
     private List<AudioStream> Lectures { get; set; } = [];
-    private HashSet<Guid> BookmarkedLectures = new();
+
     private string CurrentFilter { get; set; } = "All";
 
     private static readonly string[] Filters = ["All", "Live", "Faith", "History", "Speakers"];
@@ -110,7 +110,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         Lectures = await LectureService.GetAllLectures();
-        await LoadBookmarksAsync();
+
     }
 
     private List<AudioStream> FilteredLectures => CurrentFilter switch
@@ -152,41 +152,13 @@ else
         };
     }
 
-    private async void ToggleBookmark(Guid lectureId)
-    {
-        if (!BookmarkedLectures.Add(lectureId))
-        {
-            BookmarkedLectures.Remove(lectureId);
-        }
-        await SaveBookmarksAsync();
-        StateHasChanged();
-    }
 
-    private async Task LoadBookmarksAsync()
-    {
-        var json = await JS.InvokeAsync<string>("voiceOfIslamStorage.get", "bookmarks");
-        if (!string.IsNullOrWhiteSpace(json))
-        {
-            try
-            {
-                var ids = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
-                if (ids != null)
-                {
-                    BookmarkedLectures = ids.Select(id => Guid.TryParse(id, out var g) ? g : Guid.Empty).Where(g => g != Guid.Empty).ToHashSet();
-                }
-            }
-            catch { /* ignore */ }
-        }
-    }
 
-    private async Task SaveBookmarksAsync()
-    {
-        var ids = BookmarkedLectures.Select(g => g.ToString()).ToList();
-        var json = System.Text.Json.JsonSerializer.Serialize(ids);
-        await JS.InvokeVoidAsync("voiceOfIslamStorage.set", "bookmarks", json);
-    }
 
-    private bool IsBookmarked(Guid lectureId) => BookmarkedLectures.Contains(lectureId);
+
+
+
+
 
     private string GetFilterClass(string filter)
     {
