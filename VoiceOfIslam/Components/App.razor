@@ -70,8 +70,14 @@
 <body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
     <!-- Routes removed: see build notes. -->
     <!-- <ReconnectModal /> -->
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script src="/register-sw.js"></script>
+    <!-- Removed blazor.web.js reference: not needed for Blazor Server. -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/service-worker.published.js');
+            });
+        }
+    </script>
 </body>
 
 </html>
