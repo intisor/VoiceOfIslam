@@ -1,5 +1,4 @@
-# Use the official .NET 8 SDK image for build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy solution and restore as distinct layers
@@ -16,8 +15,7 @@ COPY VoiceOfIslam.Client/ VoiceOfIslam.Client/
 WORKDIR /src/VoiceOfIslam
 RUN dotnet publish -c Release -o /app --no-restore
 
-# Use the official .NET 8 ASP.NET runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=build /app .
 
