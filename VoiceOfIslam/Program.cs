@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http.HttpResults;
 using VoiceOfIslam.Components;
 using VoiceOfIslam.Data;
-using VoiceOfIslam.Client.Services;
+using VoiceOfIslam.Services;
 using VoiceOfIslam.Services;
 using VoiceOfIslam.Shared.Models;
 

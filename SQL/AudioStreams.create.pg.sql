@@ -1,3 +1,4 @@
+
 CREATE TABLE public."AudioStreams" (
     "Id" uuid PRIMARY KEY,
     "Title" varchar(200) NOT NULL,

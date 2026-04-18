@@ -1,0 +1,43 @@
+using System.Net.Http.Json;
+using VoiceOfIslam.Shared.Models;
+
+namespace VoiceOfIslam.Services
+{
+    public class LectureService
+    {
+        private readonly HttpClient _httpClient;
+        private List<AudioStream>? _cachedLectures;
+
+        public LectureService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<List<AudioStream>> GetAllLectures()
+        {
+            if (_cachedLectures is not null)
+            {
+                return _cachedLectures;
+            }
+
+            _cachedLectures = await _httpClient.GetFromJsonAsync<List<AudioStream>>("api/audio-streams") ?? [];
+            return _cachedLectures;
+        }
+
+        public async Task<AudioStream?> GetLiveLecture()
+        {
+            return await _httpClient.GetFromJsonAsync<AudioStream?>("api/audio-streams/live");
+        }
+
+        public async Task<List<AudioStream>> GetRecentLectures(int count)
+        {
+            return await _httpClient.GetFromJsonAsync<List<AudioStream>>($"api/audio-streams/recent/{count}") ?? [];
+        }
+
+        public async Task<string?> GetPlaybackUrl(Guid audioStreamId)
+        {
+            var response = await _httpClient.GetFromJsonAsync<PlaybackUrlResponse>($"api/audio-streams/{audioStreamId}/playback-url");
+            return string.IsNullOrWhiteSpace(response?.Url) ? null : response.Url;
+        }
+    }
+}
