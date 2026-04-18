@@ -40,8 +40,10 @@ namespace VoiceOfIslam.Services
         {
             if (_initialized) return;
             _initialized = true;
-            var darkMode = await _jsRuntime.InvokeAsync<bool>("localStorage.getItem", DarkModeKey) ?? false;
-            var notifications = await _jsRuntime.InvokeAsync<bool>("localStorage.getItem", NotificationsKey) ?? true;
+            var darkModeStr = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", DarkModeKey);
+            var notificationsStr = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", NotificationsKey);
+            var darkMode = darkModeStr == "true";
+            var notifications = notificationsStr == null ? true : notificationsStr == "true";
             State = new(darkMode, notifications);
         }
 
