@@ -23,7 +23,8 @@ COPY --from=build /app .
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-# Set environment to Production by default
-ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Set environment to Development for debugging (revert to Production before deploying)
+ENV ASPNETCORE_ENVIRONMENT=Development
 
 ENTRYPOINT ["dotnet", "VoiceOfIslam.dll"]
