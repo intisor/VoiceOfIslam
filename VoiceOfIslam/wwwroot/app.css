@@ -1,0 +1,208 @@
+/* Compact countdown and live badge for mobile */
+.countdown-row-mobile {
+  font-size: 1.1rem;
+  font-family: 'Manrope', sans-serif;
+  justify-content: center;
+}
+.countdown-part-mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 28px;
+}
+.countdown-num-mobile {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #416355;
+}
+.countdown-label-mobile {
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+}
+.countdown-sep-mobile {
+  font-size: 1.1rem;
+  color: #bbb;
+  font-weight: 600;
+}
+.live-badge-mobile {
+  display: inline-block;
+  background: #1db954;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.2em 1.1em;
+  letter-spacing: 0.05em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+/* Hide horizontal scrollbar for carousel */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile lecture card for carousel */
+.lecture-card-mobile {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+.lecture-card-mobile:active {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+/* --- Mobile Compact UI Improvements (2026-04-18) --- */
+@media (max-width: 600px) {
+  .hero-section {
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+  .hero-section h2, .hero-section p, .hero-section span, .hero-section .font-headline {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+  }
+  .hero-section .p-8, .hero-section .rounded-3xl {
+    padding: 0.75rem !important;
+    border-radius: 1rem !important;
+  }
+  .hero-section .min-w-[280px] {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .hero-section .flex-col {
+    gap: 0.5rem !important;
+  }
+  .mt-8, .mt-16, .mb-8, .mb-10, .mb-12, .pb-40 {
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+  .grid {
+    gap: 1rem !important;
+  }
+  .lecture-card, .group {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+    border-radius: 1rem !important;
+  }
+  .lecture-card h4, .group h4 {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .lecture-card p, .group p {
+    font-size: 0.85rem !important;
+  }
+  .aspect-[4/5] {
+    aspect-ratio: 1.2/1 !important;
+    min-height: 120px !important;
+    max-height: 180px !important;
+  }
+  .lecture-list, .space-y-6 {
+    gap: 0.5rem !important;
+  }
+}
+/* VoiceOfIslam PWA and Mobile-First CSS */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Manrope', Arial, sans-serif;
+  background: #fdf9f2;
+  color: #222;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Allow text selection where appropriate */
+p, h1, h2, h3, h4, span.selectable, div.selectable {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+main {
+  flex: 1 0 auto;
+  width: 100vw;
+  max-width: 100vw;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Mobile-first grid and spacing */
+.max-w-md, .max-w-screen-md, .max-w-screen-xl {
+  max-width: 100vw !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.px-6, .px-8 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Responsive font sizes */
+h1, h2, h3, h4 {
+  word-break: break-word;
+}
+
+@media (min-width: 600px) {
+  .max-w-md, .max-w-screen-md {
+    max-width: 480px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .max-w-screen-xl {
+    max-width: 900px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Touch targets */
+button, .btn, input[type=range] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Hide scrollbars on mobile */
+body, main {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+body::-webkit-scrollbar, main::-webkit-scrollbar {
+  display: none;
+}
+
+/* PWA install banner spacing */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fffbe8;
+  color: #222;
+  padding: 1rem;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
