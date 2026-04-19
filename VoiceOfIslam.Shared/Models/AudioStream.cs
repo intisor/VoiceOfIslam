@@ -8,7 +8,7 @@ namespace VoiceOfIslam.Shared.Models
     public class AudioStream
     {
         [Key]
-        public Guid Id { get; set; } = Guid.CreateVersion7();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         [MaxLength(200)] 

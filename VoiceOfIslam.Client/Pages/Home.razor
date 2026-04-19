@@ -112,12 +112,12 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (LiveLecture == null)
-        {
-            LiveLecture = await LectureService.GetLiveLecture();
-        }
-        RecentLectures = await LectureService.GetRecentLectures(3);
-        
+        var allLectures = await LectureService.GetAllLectures();
+        LiveLecture = allLectures.FirstOrDefault(l => l.IsLive);
+        RecentLectures = allLectures
+            .OrderByDescending(l => l.CreatedAt)
+            .Take(3)
+            .ToList();
         StartCountdownTimer();
     }
 
