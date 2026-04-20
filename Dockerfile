@@ -27,7 +27,7 @@ RUN mkdir -p /app/wwwroot \
 	&& ls -l /blazorout/wwwroot \
 	&& echo "--- /app/wwwroot before copy ---" \
 	&& ls -l /app/wwwroot \
-	&& cp -r /blazorout/wwwroot/* /app/wwwroot/ \
+	&& cp -a /blazorout/wwwroot/. /app/wwwroot/ \
 	&& echo "--- /app/wwwroot after copy ---" \
 	&& ls -l /app/wwwroot \
 	&& find /app/wwwroot -name "*.razor.js" -type f -delete \
