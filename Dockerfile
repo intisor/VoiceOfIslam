@@ -36,7 +36,9 @@ RUN mkdir -p /app/wwwroot \
 	&& echo "--- FINAL /app/wwwroot ---" \
 	&& ls -l /app/wwwroot \
 	&& ls -l /app/wwwroot/_framework \
-	&& cat /app/wwwroot/index.html
+	&& cat /app/wwwroot/index.html \
+	&& echo "--- FULL RECURSIVE /app/wwwroot/_framework ---" \
+	&& ls -lR /app/wwwroot/_framework
 	&& echo "--- FULL RECURSIVE /app/wwwroot/_framework ---" \
 	&& ls -lR /app/wwwroot/_framework
 
