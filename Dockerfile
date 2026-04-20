@@ -35,6 +35,7 @@ RUN mkdir -p /app/wwwroot \
 	&& ls -lR /app/wwwroot \
 	&& echo "--- FINAL /app/wwwroot ---" \
 	&& ls -l /app/wwwroot \
+	&& ls -l /app/wwwroot/_framework \
 	&& cat /app/wwwroot/index.html
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
