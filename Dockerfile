@@ -16,8 +16,18 @@ RUN dotnet restore VoiceOfIslam.Api/VoiceOfIslam.Api.csproj
 COPY VoiceOfIslam.Api/ VoiceOfIslam.Api/
 RUN dotnet publish VoiceOfIslam.Api/VoiceOfIslam.Api.csproj -c Release -o /app --no-restore
 
-# Copy Blazor WASM output into API wwwroot
-RUN rm -rf /app/wwwroot/* && cp -r /blazorout/wwwroot/* /app/wwwroot/
+# Ensure wwwroot exists and copy Blazor WASM output into API wwwroot
+RUN mkdir -p /app/wwwroot \
+	&& echo "--- /blazorout/wwwroot contents ---" \
+	&& ls -l /blazorout/wwwroot \
+	&& echo "--- /app/wwwroot before copy ---" \
+	&& ls -l /app/wwwroot \
+	&& cp -r /blazorout/wwwroot/* /app/wwwroot/ \
+	&& echo "--- /app/wwwroot after copy ---" \
+	&& ls -l /app/wwwroot \
+	&& find /app/wwwroot -name "*.razor.js" -type f -delete \
+	&& echo "--- /app/wwwroot after .razor.js cleanup ---" \
+	&& ls -lR /app/wwwroot
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
