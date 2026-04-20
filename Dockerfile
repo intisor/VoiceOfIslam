@@ -39,8 +39,6 @@ RUN mkdir -p /app/wwwroot \
 	&& cat /app/wwwroot/index.html \
 	&& echo "--- FULL RECURSIVE /app/wwwroot/_framework ---" \
 	&& ls -lR /app/wwwroot/_framework
-	&& echo "--- FULL RECURSIVE /app/wwwroot/_framework ---" \
-	&& ls -lR /app/wwwroot/_framework
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
