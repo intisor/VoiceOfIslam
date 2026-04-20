@@ -8,7 +8,11 @@ COPY VoiceOfIslam.Shared/VoiceOfIslam.Shared.csproj VoiceOfIslam.Shared/
 RUN dotnet restore VoiceOfIslam.Client/VoiceOfIslam.Client.csproj
 COPY VoiceOfIslam.Client/ VoiceOfIslam.Client/
 COPY VoiceOfIslam.Shared/ VoiceOfIslam.Shared/
-RUN dotnet publish VoiceOfIslam.Client/VoiceOfIslam.Client.csproj -c Release -o /blazorout
+RUN dotnet publish VoiceOfIslam.Client/VoiceOfIslam.Client.csproj -c Release -o /blazorout \
+	&& echo "--- /blazorout contents after publish ---" \
+	&& ls -l /blazorout \
+	&& echo "--- /blazorout/wwwroot contents after publish ---" \
+	&& ls -l /blazorout/wwwroot || echo "/blazorout/wwwroot missing"
 
 # Restore and build API
 COPY VoiceOfIslam.Api/VoiceOfIslam.Api.csproj VoiceOfIslam.Api/
