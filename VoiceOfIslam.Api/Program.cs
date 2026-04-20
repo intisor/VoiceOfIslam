@@ -10,12 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-// Serve Blazor WebAssembly static files
+// Serve Blazor WebAssembly static files and enable client-side routing
 app.UseDefaultFiles();
 app.UseStaticFiles();
-// app.UseCors();
-
-// Optionally, fallback to index.html for client-side routing
 app.MapFallbackToFile("index.html");
 
 // API endpoints
