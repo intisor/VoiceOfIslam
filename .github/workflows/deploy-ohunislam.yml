@@ -43,6 +43,7 @@ jobs:
 
       - name: Copy WASM Client to API wwwroot
         run: |
+          mkdir -p ./publish-api/wwwroot
           rm -rf ./publish-api/wwwroot/*
           cp -r ./publish-client/wwwroot/* ./publish-api/wwwroot/
 
