@@ -1,0 +1,39 @@
+# Deploy .NET app to Azure Web App - OhunIslam
+# Docs: https://docs.microsoft.com/azure/app-service/deploy-azure-apps
+
+name: Deploy to Azure Web App - OhunIslam
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore VoiceOfIslam/VoiceOfIslam.csproj
+
+      - name: Build
+        run: dotnet build VoiceOfIslam/VoiceOfIslam.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish VoiceOfIslam/VoiceOfIslam.csproj --configuration Release --no-build --output ./publish
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'OhunIslam'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: ./publish
