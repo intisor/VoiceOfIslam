@@ -3,7 +3,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - OhunIslam
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
