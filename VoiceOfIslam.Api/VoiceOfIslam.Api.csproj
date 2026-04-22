@@ -10,4 +10,8 @@
       <ProjectReference Include="..\VoiceOfIslam.Shared\VoiceOfIslam.Shared.csproj" />
     </ItemGroup>
 
+     <ItemGroup>
+      <Content Include="wwwroot\**\*" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>

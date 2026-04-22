@@ -13,8 +13,8 @@ var app = builder.Build();
 // Serve Blazor WebAssembly static files and enable client-side routing
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.MapFallbackToFile("index.html");
 
+app.UseRouting(); 
 // API endpoints
 
 // In-memory sample data for demonstration
@@ -58,5 +58,7 @@ app.MapPost("/api/blobs", (AudioStream newStream) =>
     audioStreams.Add(newStream);
     return Results.Created($"/api/blobs/{newStream.Id}", newStream);
 });
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
