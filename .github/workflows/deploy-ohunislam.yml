@@ -27,8 +27,24 @@ jobs:
       - name: Build
         run: dotnet build VoiceOfIslam/VoiceOfIslam.csproj --configuration Release --no-restore
 
-      - name: Publish
-        run: dotnet publish VoiceOfIslam/VoiceOfIslam.csproj --configuration Release --no-build --output ./publish
+      - name: Publish API
+        run: dotnet publish VoiceOfIslam.Api/VoiceOfIslam.Api.csproj --configuration Release --no-build --output ./publish-api
+
+      - name: Publish WASM Client
+        run: dotnet publish VoiceOfIslam.Client/VoiceOfIslam.Client.csproj --configuration Release --no-build --output ./publish-client
+
+      - name: Copy WASM Client to API wwwroot
+        run: |
+          rm -rf ./publish-api/wwwroot/*
+          cp -r ./publish-client/wwwroot/* ./publish-api/wwwroot/
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'OhunIslam'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: ./publish-api
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
