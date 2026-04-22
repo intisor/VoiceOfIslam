@@ -1,53 +1,67 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - OhunIslam
 
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.x'
+          dotnet-version: '10.0.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      # ---- API ----
+      - name: Restore API dependencies
+        run: dotnet restore VoiceOfIslam.Api/VoiceOfIslam.Api.csproj
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      - name: Publish API
+        run: dotnet publish VoiceOfIslam.Api/VoiceOfIslam.Api.csproj --configuration Release --output ./publish-api
 
-      - name: Upload artifact for deployment job
+      # ---- WASM Client ----
+      - name: Restore Client dependencies
+        run: dotnet restore VoiceOfIslam.Client/VoiceOfIslam.Client.csproj
+
+      - name: Publish Client
+        run: dotnet publish VoiceOfIslam.Client/VoiceOfIslam.Client.csproj --configuration Release --output ./publish-client
+
+      # ---- Merge Client into API ----
+      - name: Copy WASM Client to API wwwroot
+        run: |
+          mkdir -p ./publish-api/wwwroot
+          rm -rf ./publish-api/wwwroot/*
+          cp -r ./publish-client/wwwroot/* ./publish-api/wwwroot/
+
+      # ---- Upload artifact ----
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: app
+          path: ./publish-api
+
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-      
+          name: app
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -56,10 +70,8 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7440CAA0269542CCA37A536757BF5994 }}
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'OhunIslam'
           slot-name: 'Production'
           package: .
-          
