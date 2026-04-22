@@ -27,8 +27,16 @@ jobs:
       - name: Build
         run: dotnet build VoiceOfIslam/VoiceOfIslam.csproj --configuration Release --no-restore
 
+
+      - name: Restore API dependencies
+        run: dotnet restore VoiceOfIslam.Api/VoiceOfIslam.Api.csproj
+
       - name: Publish API
         run: dotnet publish VoiceOfIslam.Api/VoiceOfIslam.Api.csproj --configuration Release --no-build --output ./publish-api
+
+
+      - name: Restore WASM Client dependencies
+        run: dotnet restore VoiceOfIslam.Client/VoiceOfIslam.Client.csproj
 
       - name: Publish WASM Client
         run: dotnet publish VoiceOfIslam.Client/VoiceOfIslam.Client.csproj --configuration Release --no-build --output ./publish-client
