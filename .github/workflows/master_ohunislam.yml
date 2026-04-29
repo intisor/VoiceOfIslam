@@ -35,11 +35,11 @@ jobs:
         run: dotnet publish VoiceOfIslam.Client/VoiceOfIslam.Client.csproj --configuration Release --output ./publish-client
 
       # ---- Merge Client into API ----
-      - name: Copy WASM Client to API wwwroot
+      - name: Copy WASM Client into API wwwroot
         run: |
           mkdir -p ./publish-api/wwwroot
           rm -rf ./publish-api/wwwroot/*
-          cp -r ./publish-client/wwwroot/* ./publish-api/wwwroot/
+          cp -r ./publish-client/* ./publish-api/wwwroot/
 
       # ---- Upload artifact ----
       - name: Upload artifact

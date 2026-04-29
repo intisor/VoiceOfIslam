@@ -27,7 +27,17 @@
 ## 4. Custom Domain & SSL
 - Both Render and Fly.io support custom domains and free SSL in their dashboard
 
-## 5. Troubleshooting
+## 5. Azure App Service environment variables
+When deploying `VoiceOfIslam.Api` with the `VoiceOfIslam.Client` WASM app injected into `wwwroot`, Azure App Service must have the following App Settings:
+
+- `ASPNETCORE_ENVIRONMENT=Production`
+- `ConnectionStrings__DefaultConnection` — your PostgreSQL connection string
+- `BlobStorage__ConnectionString` — your Azure Blob Storage connection string
+- `BlobStorage__SasTokenMinutes=30` — optional override for SAS expiry
+
+These settings automatically flow into `IConfiguration` in the API app.
+
+## 6. Troubleshooting
 - Check logs in Render/Fly.io dashboard
 - Make sure your database and blob storage are accessible from the host
 - For migrations, use Render/Fly.io shell or CI/CD to run `dotnet ef database update`
