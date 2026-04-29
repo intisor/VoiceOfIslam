@@ -1,12 +1,23 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VoiceOfIslam.Api.Data;
+using VoiceOfIslam.Api.Services;
 using VoiceOfIslam.Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container if needed
-// builder.Services.AddCors();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<BlobSasService>();
+builder.Services.AddScoped<AudioService>();
+
+builder.Services.AddOptions<BlobStorageOptions>()
+    .BindConfiguration(BlobStorageOptions.SectionName);
 
 var app = builder.Build();
 
@@ -14,49 +25,22 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseRouting(); 
-// API endpoints
+app.UseRouting();
 
-// In-memory sample data for demonstration
-var audioStreams = new List<AudioStream>
+app.MapGet("/api/audio-streams", async (AudioService audioService) => await audioService.GetPastAudios());
+app.MapGet("/api/audio-streams/live", async (AudioService audioService) => await audioService.GetLiveLecture());
+app.MapGet("/api/audio-streams/recent/{count:int}", async (int count, AudioService audioService) => await audioService.GetRecentLectures(count));
+app.MapGet("/api/audio-streams/{id:guid}", async (Guid id, AudioService audioService) =>
 {
-    new AudioStream {
-        Id = Guid.NewGuid(),
-        Title = "Sample Lecture 1",
-        Description = "Introduction to Islam",
-        BlobUrl = "https://example.com/audio1.mp3",
-        CreatedAt = DateTime.UtcNow.AddDays(-2),
-        Speaker = "Imam Ali",
-        Duration = TimeSpan.FromMinutes(45)
-    },
-    new AudioStream {
-        Id = Guid.NewGuid(),
-        Title = "Sample Lecture 2",
-        Description = "History of Prophets",
-        BlobUrl = "https://example.com/audio2.mp3",
-        CreatedAt = DateTime.UtcNow.AddDays(-1),
-        Speaker = "Imam Bilal",
-        Duration = TimeSpan.FromMinutes(50)
-    }
-};
-
-// Endpoint: List all audio streams (blobs)
-app.MapGet("/api/blobs", () => audioStreams);
-
-// Endpoint: Download a single audio stream (blob) by ID
-app.MapGet("/api/blobs/{id}", (Guid id) =>
-{
-    var stream = audioStreams.FirstOrDefault(a => a.Id == id);
+    var stream = await audioService.GetAudioStreamById(id);
     return stream is not null ? Results.Ok(stream) : Results.NotFound();
 });
-
-// Endpoint: Upload a new audio stream (blob) (optional, demo only)
-app.MapPost("/api/blobs", (AudioStream newStream) =>
+app.MapGet("/api/audio-streams/{id:guid}/playback-url", async (Guid id, AudioService audioService) =>
 {
-    newStream.Id = Guid.NewGuid();
-    newStream.CreatedAt = DateTime.UtcNow;
-    audioStreams.Add(newStream);
-    return Results.Created($"/api/blobs/{newStream.Id}", newStream);
+    var playbackUrl = await audioService.GetAuthorizedPlaybackUrl(id);
+    return string.IsNullOrWhiteSpace(playbackUrl)
+        ? Results.NotFound()
+        : Results.Ok(new PlaybackUrlResponse { Url = playbackUrl });
 });
 
 app.MapFallbackToFile("index.html");

@@ -21,15 +21,15 @@ namespace VoiceOfIslam.Client.Services
                 return _cachedLectures;
             }
 
-            _cachedLectures = await _httpClient.GetFromJsonAsync<List<AudioStream>>("api/blobs") ?? [];
+            _cachedLectures = await _httpClient.GetFromJsonAsync<List<AudioStream>>("api/audio-streams") ?? [];
             return _cachedLectures;
         }
 
 
-        // Download a single audio stream (blob) by ID
+        // Download a single audio stream by ID
         public async Task<AudioStream?> GetLectureById(Guid id)
         {
-            return await _httpClient.GetFromJsonAsync<AudioStream?>($"api/blobs/{id}");
+            return await _httpClient.GetFromJsonAsync<AudioStream?>("api/audio-streams/" + id);
         }
 
         public async Task<List<AudioStream>> GetRecentLectures(int count)
